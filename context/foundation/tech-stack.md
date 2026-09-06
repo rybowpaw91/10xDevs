@@ -5,7 +5,7 @@ project_name: loadfit
 hints:
   language_family: js
   team_size: solo
-  deployment_target: cloudflare-pages
+  deployment_target: cloudflare-workers
   ci_provider: github-actions
   ci_default_flow: auto-deploy-on-merge
   bootstrapper_confidence: first-class
@@ -31,6 +31,6 @@ the login requirement, the save/reuse features (FR-007, FR-008), and the
 type-safety that reduces risk around the guardrail's correctness bar. Its
 bootstrapper confidence is first-class: expect mostly-smooth scaffolding with
 occasional manual steps. Deployment stays on the starter's own default,
-Cloudflare Pages/Workers; CI runs on GitHub Actions with auto-deploy on merge
+Cloudflare Workers (with static assets); CI runs on GitHub Actions with auto-deploy on merge
 to main. No payments, realtime, AI, or background-job features are in scope
 per the PRD.
