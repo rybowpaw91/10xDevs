@@ -23,7 +23,7 @@
       "Bash(git push)"
     ],
     "deny": [
-      "Bash(rm -rf *)",
+      "Bash(rm -rf *)"
     ]
   }
 }

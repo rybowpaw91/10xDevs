@@ -2,8 +2,8 @@
   "package": "@przeprogramowani/10x-cli",
   "version": "1.6.1",
   "manifestVersion": 2,
-  "lastApplied": "2026-09-04T21:28:28.418Z",
-  "lessonId": "m1l4",
+  "lastApplied": "2026-09-04T22:34:12.547Z",
+  "lessonId": "m1l5",
   "course": "10xdevs3",
   "tool": "claude-code",
   "files": {
@@ -73,10 +73,20 @@
         "files": [
           "SKILL.md"
         ]
+      },
+      "10x-infra-research": {
+        "files": [
+          "references/agent-friendly-criteria.md",
+          "SKILL.md"
+        ]
       }
     },
     "prompts": [
-      "skill-explainer.md"
+      "skill-explainer.md",
+      "m1l5-1-plan-integration.md",
+      "m1l5-2-constrain-approach.md",
+      "m1l5-3-extend-prerequisites.md",
+      "m1l5-4-store-plan.md"
     ],
     "configs": []
   }
