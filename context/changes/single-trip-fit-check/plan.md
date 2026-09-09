@@ -361,27 +361,27 @@ Not applicable — this is a purely additive slice with no existing data model, 
 
 #### Automated
 
-- [x] 2.1 `npm run test` passes, including unit tests and the fast-check property suite
-- [x] 2.2 `npm run lint` passes
-- [x] 2.3 Type checking passes
+- [x] 2.1 `npm run test` passes, including unit tests and the fast-check property suite — 3aebd7c
+- [x] 2.2 `npm run lint` passes — 3aebd7c
+- [x] 2.3 Type checking passes — 3aebd7c
 
 #### Manual
 
-- [x] 2.4 Hand-picked realistic scenarios produce sensible utilization % and packing order
+- [x] 2.4 Hand-picked realistic scenarios produce sensible utilization % and packing order — 3aebd7c
 
 ### Phase 3: Fit-Check API Route
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 Type checking passes
-- [ ] 3.3 `npm run build` succeeds with the new route present
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 Type checking passes
+- [x] 3.3 `npm run build` succeeds with the new route present
 
 #### Manual
 
-- [ ] 3.4 Valid authenticated POST to `/api/fit-check` returns a correctly-shaped 200 result
-- [ ] 3.5 Invalid payload (bad dimension, >200 total units) returns a 400 with a clear message
-- [ ] 3.6 Unauthenticated request is redirected/rejected per middleware behavior
+- [x] 3.4 Valid authenticated POST to `/api/fit-check` returns a correctly-shaped 200 result
+- [x] 3.5 Invalid payload (bad dimension, >200 total units) returns a 400 with a clear message
+- [x] 3.6 Unauthenticated request is redirected/rejected per middleware behavior
 
 ### Phase 4: Fit-Check Page & Results UI
 

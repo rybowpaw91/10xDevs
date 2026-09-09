@@ -3,7 +3,7 @@ change_id: single-trip-fit-check
 title: Single-trip fit check
 status: implementing
 created: 2026-09-09
-updated: 2026-09-09
+updated: 2026-09-10
 archived_at: null
 ---
 
