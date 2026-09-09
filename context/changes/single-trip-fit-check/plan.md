@@ -352,22 +352,22 @@ Not applicable — this is a purely additive slice with no existing data model, 
 
 #### Automated
 
-- [x] 1.1 `npm install` completes and adds vitest/fast-check to package.json
-- [x] 1.2 `npm run test` runs successfully with zero test files present
-- [x] 1.3 `npm run lint` passes
-- [x] 1.4 Type checking passes with new `src/types.ts` in place
+- [x] 1.1 `npm install` completes and adds vitest/fast-check to package.json — 2fb51f6
+- [x] 1.2 `npm run test` runs successfully with zero test files present — 2fb51f6
+- [x] 1.3 `npm run lint` passes — 2fb51f6
+- [x] 1.4 Type checking passes with new `src/types.ts` in place — 2fb51f6
 
 ### Phase 2: Packing Algorithm Core (Extreme-Point Heuristic)
 
 #### Automated
 
-- [ ] 2.1 `npm run test` passes, including unit tests and the fast-check property suite
-- [ ] 2.2 `npm run lint` passes
-- [ ] 2.3 Type checking passes
+- [x] 2.1 `npm run test` passes, including unit tests and the fast-check property suite
+- [x] 2.2 `npm run lint` passes
+- [x] 2.3 Type checking passes
 
 #### Manual
 
-- [ ] 2.4 Hand-picked realistic scenarios produce sensible utilization % and packing order
+- [x] 2.4 Hand-picked realistic scenarios produce sensible utilization % and packing order
 
 ### Phase 3: Fit-Check API Route
 

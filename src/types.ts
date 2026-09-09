@@ -45,6 +45,7 @@ export interface FitCheckResult {
   reason?: string;
   oversizedItemIds?: string[];
   packingOrder: string[];
+  placements: PlacedUnit[];
   layers: LayerGrid[];
   utilizationPercent: number;
 }
