@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import GoodsFitForm from "@/components/fit-check/GoodsFitForm";
+---
+
+<Layout title="Fit check">
+  <div class="bg-cosmic min-h-screen p-4 py-10">
+    <div
+      class="mx-auto w-full max-w-3xl rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl"
+    >
+      <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+        Single-trip fit check
+      </h1>
+      <GoodsFitForm client:load />
+    </div>
+  </div>
+</Layout>

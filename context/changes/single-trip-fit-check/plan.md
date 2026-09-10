@@ -373,30 +373,30 @@ Not applicable — this is a purely additive slice with no existing data model, 
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 Type checking passes
-- [x] 3.3 `npm run build` succeeds with the new route present
+- [x] 3.1 `npm run lint` passes — 125b263
+- [x] 3.2 Type checking passes — 125b263
+- [x] 3.3 `npm run build` succeeds with the new route present — 125b263
 
 #### Manual
 
-- [x] 3.4 Valid authenticated POST to `/api/fit-check` returns a correctly-shaped 200 result
-- [x] 3.5 Invalid payload (bad dimension, >200 total units) returns a 400 with a clear message
-- [x] 3.6 Unauthenticated request is redirected/rejected per middleware behavior
+- [x] 3.4 Valid authenticated POST to `/api/fit-check` returns a correctly-shaped 200 result — 125b263
+- [x] 3.5 Invalid payload (bad dimension, >200 total units) returns a 400 with a clear message — 125b263
+- [x] 3.6 Unauthenticated request is redirected/rejected per middleware behavior — 125b263
 
 ### Phase 4: Fit-Check Page & Results UI
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` passes
-- [ ] 4.2 Type checking passes
-- [ ] 4.3 `npm run build` succeeds
+- [x] 4.1 `npm run lint` passes
+- [x] 4.2 Type checking passes
+- [x] 4.3 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 4.4 Adding/removing goods rows works correctly
-- [ ] 4.5 Vehicle preset selection pre-fills editable dimension fields
-- [ ] 4.6 Fitting goods list shows verdict, text order, per-layer grids, volume-only utilization %
-- [ ] 4.7 Oversized single item shows the specific-reason no-fit message
-- [ ] 4.8 Exceeding 200 total units shows the cap's validation message
-- [ ] 4.9 Signed-out visit to `/fit-check` redirects to sign-in
-- [ ] 4.10 Dashboard link to the new page works
+- [x] 4.4 Adding/removing goods rows works correctly
+- [x] 4.5 Vehicle preset selection pre-fills editable dimension fields
+- [x] 4.6 Fitting goods list shows verdict, text order, per-layer grids, volume-only utilization %
+- [x] 4.7 Oversized single item shows the specific-reason no-fit message
+- [x] 4.8 Exceeding 200 total units shows the cap's validation message
+- [x] 4.9 Signed-out visit to `/fit-check` redirects to sign-in
+- [x] 4.10 Dashboard link to the new page works
