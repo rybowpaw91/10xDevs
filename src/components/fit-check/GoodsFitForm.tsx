@@ -149,9 +149,13 @@ export default function GoodsFitForm() {
       });
 
       if (!response.ok) {
-        const errorBody = (await response.json()) as { error?: string; issues?: ErrorTree };
-        const issueMessages = collectZodErrors(errorBody.issues);
-        setApiError(issueMessages.length > 0 ? issueMessages.join(" ") : (errorBody.error ?? "Request failed."));
+        try {
+          const errorBody = (await response.json()) as { error?: string; issues?: ErrorTree };
+          const issueMessages = collectZodErrors(errorBody.issues);
+          setApiError(issueMessages.length > 0 ? issueMessages.join(" ") : (errorBody.error ?? "Request failed."));
+        } catch {
+          setApiError(`Request failed (status ${response.status}).`);
+        }
         return;
       }
 
