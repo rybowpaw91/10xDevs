@@ -1,9 +1,9 @@
 ---
 change_id: single-trip-fit-check
 title: Single-trip fit check
-status: implementing
+status: implemented
 created: 2026-09-09
-updated: 2026-09-10
+updated: 2026-09-11
 archived_at: null
 ---
 

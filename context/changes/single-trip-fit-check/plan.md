@@ -387,16 +387,16 @@ Not applicable — this is a purely additive slice with no existing data model, 
 
 #### Automated
 
-- [x] 4.1 `npm run lint` passes
-- [x] 4.2 Type checking passes
-- [x] 4.3 `npm run build` succeeds
+- [x] 4.1 `npm run lint` passes — e360bbb
+- [x] 4.2 Type checking passes — e360bbb
+- [x] 4.3 `npm run build` succeeds — e360bbb
 
 #### Manual
 
-- [x] 4.4 Adding/removing goods rows works correctly
-- [x] 4.5 Vehicle preset selection pre-fills editable dimension fields
-- [x] 4.6 Fitting goods list shows verdict, text order, per-layer grids, volume-only utilization %
-- [x] 4.7 Oversized single item shows the specific-reason no-fit message
-- [x] 4.8 Exceeding 200 total units shows the cap's validation message
-- [x] 4.9 Signed-out visit to `/fit-check` redirects to sign-in
-- [x] 4.10 Dashboard link to the new page works
+- [x] 4.4 Adding/removing goods rows works correctly — e360bbb
+- [x] 4.5 Vehicle preset selection pre-fills editable dimension fields — e360bbb
+- [x] 4.6 Fitting goods list shows verdict, text order, per-layer grids, volume-only utilization % — e360bbb
+- [x] 4.7 Oversized single item shows the specific-reason no-fit message — e360bbb
+- [x] 4.8 Exceeding 200 total units shows the cap's validation message — e360bbb
+- [x] 4.9 Signed-out visit to `/fit-check` redirects to sign-in — e360bbb
+- [x] 4.10 Dashboard link to the new page works — e360bbb
