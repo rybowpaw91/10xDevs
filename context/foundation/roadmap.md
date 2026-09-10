@@ -3,7 +3,7 @@ project: LoadFit
 version: 1
 status: draft
 created: 2026-09-09
-updated: 2026-09-09
+updated: 2026-09-10
 prd_version: 1
 main_goal: low-complexity
 top_blocker: capacity
@@ -41,7 +41,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID              | Outcome (user can …)                                                              | Prerequisites | PRD refs                                | Status |
 | ---- | ----------------------- | ----------------------------------------------------------------------------------- | -------------- | ---------------------------------------- | ------ |
-| S-01 | `single-trip-fit-check` | Submit a goods list + vehicle and see fit/no-fit, a packing order, and utilization % | —              | US-01, FR-001, FR-002, FR-003, FR-004, FR-005 | in-progress |
+| S-01 | `single-trip-fit-check` | Submit a goods list + vehicle and see fit/no-fit, a packing order, and utilization % | —              | US-01, FR-001, FR-002, FR-003, FR-004, FR-005 | done |
 
 ## Baseline
 
@@ -71,7 +71,7 @@ No Foundations for this milestone. The baseline already covers everything S-01 d
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This is the milestone's entire scope, so its correctness carries all the weight — the fit-check must never claim a fit that doesn't physically work (PRD's non-negotiable guardrail), even though heuristic false negatives are an accepted trade-off. Verification stays inside this slice rather than a separate foundation, per the low-complexity framing: keep the flow small, but the guardrail inside it is not negotiable.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -98,4 +98,4 @@ _Empty — this is the first milestone._
 
 ## Done
 
-_Empty — nothing archived yet. `/10x-archive` appends here when a matching change is archived._
+- **S-01: user can enter a goods list (dimensions, quantity, rotation and stackable flags per item) and a vehicle's cargo dimensions, submit once, and see whether everything fits, a recommended packing order (text + lightweight grid), and the volume-utilization percentage.** — Archived 2026-09-10 → `context/archive/2026-09-09-single-trip-fit-check/`. Lesson: —.
