@@ -42,7 +42,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 | ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
 | S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | done |
-| S-02 | `save-goods-list`      | Save the current goods list as a named set and load it back into the form on a later visit    | —              | FR-007   | ready  |
+| S-02 | `save-goods-list`      | Save the current goods list as a named set and load it back into the form on a later visit    | —              | FR-007   | planning |
 
 ## Baseline
 
@@ -84,7 +84,7 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** More schema surface than S-01 — a saved list holds multiple items, not one flat row, so the child-table-vs-JSONB-column tradeoff needs a deliberate call during `/10x-plan` (affects how easily individual saved items can be edited later). Doesn't block sequencing; just a design decision to make explicitly rather than default into.
-- **Status:** ready
+- **Status:** planning
 
 ## Backlog Handoff
 
@@ -92,6 +92,8 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 | ---------- | ----------------------- | ------------------------------------------------------------- | ---------------------- | ----- |
 | S-01       | `save-vehicle-profile`  | Save & reuse vehicle profile on the fit-check page             | yes                    | Run `/10x-plan save-vehicle-profile` |
 | S-02       | `save-goods-list`       | Save & reuse goods list on the fit-check page                  | yes                    | Run `/10x-plan save-goods-list` |
+
+Each Change ID above is implemented on its own branch of the same name, created when `/10x-implement` starts and merged back to `master` locally once the change is complete — see CLAUDE.md's "Git workflow for changes".
 
 ## Open Roadmap Questions
 

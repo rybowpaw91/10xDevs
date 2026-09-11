@@ -46,6 +46,15 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 - **Services/helpers** go in `src/lib/` (or `src/lib/services/` for extracted business logic).
 - **Shared types** (entities, DTOs) go in `src/types.ts`.
 
+### Git workflow for changes
+
+Each change (`context/changes/<change-id>/`) is implemented on its own branch, named exactly after `<change-id>` (e.g. `save-goods-list`), branched from `master`.
+
+- The branch is created when `/10x-implement` starts — not at `/10x-new` or `/10x-plan` time. Planning artifacts (`change.md`, `plan.md`, `plan-brief.md`) are created and committed on `master`; only implementation work happens on the change's branch.
+- Phases within a change commit sequentially onto that branch, same as the existing per-phase commit ritual.
+- Once the change is fully implemented (and reviewed, if `/10x-impl-review` runs), merge it back into `master` locally (fast-forward or a plain merge) — no PR required for this solo project.
+- `/10x-archive` runs after the merge back to `master`.
+
 ### Environment
 
 - Node.js v22.14.0 (see `.nvmrc`)
