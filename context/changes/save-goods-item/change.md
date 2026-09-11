@@ -1,7 +1,7 @@
 ---
 change_id: save-goods-item
 title: Save goods item
-status: new
+status: planned
 created: 2026-09-11
 updated: 2026-09-11
 archived_at: null
