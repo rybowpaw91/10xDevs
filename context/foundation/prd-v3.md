@@ -1,8 +1,9 @@
 ---
 project: "LoadFit"
+version: 3
+status: draft
+created: 2026-09-11
 context_type: greenfield
-created: 2026-09-04
-updated: 2026-09-11
 product_type: web-app
 target_scale:
   users: medium
@@ -12,31 +13,9 @@ timeline_budget:
   mvp_weeks: 3
   hard_deadline: null
   after_hours_only: true
-checkpoint:
-  current_phase: 8
-  phases_completed: [1, 2, 3, 4, 5, 6, 7]
-  gray_areas_resolved:
-    - topic: "pain category"
-      decision: "workflow friction — manual/spreadsheet load planning is a slow, clunky step in otherwise routine trip prep"
-    - topic: "insight"
-      decision: "no one has built an accessible load-planning tool for small/mid operators — existing tools target enterprise fleets (WMS/ERP)"
-    - topic: "primary persona scope"
-      decision: "one person planning a single run (dispatcher / warehouse worker / small owner-operator), one vehicle, one load, one trip at a time"
-    - topic: "access model"
-      decision: "login required (mechanism TBD downstream); flat role model, no role separation"
-    - topic: "MVP scope cut"
-      decision: "dropped visual (2D/3D) load-plan rendering and weight/max-load constraint from v1; kept volume-based fit check + text packing order. Both deferred to v2."
-    - topic: "weight/max-load scope (revisited 2026-09-11)"
-      decision: "reversed for v1: weight now affects both the fit determination (hard cap — total weight must not exceed vehicle payload) and the packing order (heavier items must not be stacked on top of lighter ones). Promoted to must-have. 2D/3D rendering and multi-vehicle assignment remain out of scope."
-    - topic: "FR-007 unit of reuse (corrected 2026-09-11)"
-      decision: "FR-007 was originally written and built as saving a whole goods LIST (a named set of line items saved and reused together). The actual intent is saving a single goods ITEM as a reusable template (label + dimensions + rotatable + stackable), independent of any particular list — mirroring FR-008's vehicle-profile pattern but for one goods item at a time. FR-007 rewritten accordingly; the in-progress list-based implementation was discarded and rebuilt as item-based."
-  frs_drafted: 11
-  quality_check_status: accepted
 ---
 
-# LoadFit — Shape Notes
-
-Seed idea source: `ideas_notes.md` (Polish working notes, course input for PRD generation).
+# LoadFit — Product Requirements Document
 
 ## Vision & Problem Statement
 
@@ -47,10 +26,6 @@ Purpose-built load-optimization tooling exists, but it lives inside enterprise W
 ## User & Persona
 
 **Primary persona:** A single person planning one run — a dispatcher, warehouse worker, or small transport-company owner-operator. They plan one vehicle, one load, one trip at a time. They reach for this tool right before a run, when they need to know whether today's goods fit on the vehicle and how to arrange them.
-
-## Access Control
-
-Login required (email/password, OAuth, or passwordless — specific mechanism is a downstream tech-stack decision, not a product decision). Flat user model: every logged-in user sees the same thing and has the same capabilities. No admin/member/guest role split for the MVP.
 
 ## Success Criteria
 
@@ -64,8 +39,6 @@ Login required (email/password, OAuth, or passwordless — specific mechanism is
 ### Guardrails
 - The packing-order output must never claim a fit that physically doesn't work (correctness of the fit-check is non-negotiable — a false "it fits" is worse than no answer).
 - A "fits" result must never place a heavier item on top of a lighter one, and must never claim a fit when the total goods weight exceeds the vehicle's maximum payload.
-
-**MVP scope note:** visual (2D/3D) load-plan rendering was scoped out of v1 after a timeline-cost check; explicit v2 candidate — see `## Non-Goals`. Weight/max-load constraint checking, originally cut for the same reason, was revisited and promoted to must-have on 2026-09-11.
 
 ## User Stories
 
@@ -98,9 +71,9 @@ Login required (email/password, OAuth, or passwordless — specific mechanism is
 - FR-003: System calculates whether the full goods list fits within the vehicle's cargo volume, respecting each item's rotation and stacking constraints. Priority: must-have
   > Socrates: Counter-argument considered: "a heuristic solver can also produce false negatives, not just false positives." Resolution: accepted as a known heuristic limitation — the guardrail protects against false positives (claiming a fit that doesn't work); false negatives are a documented trade-off of a heuristic vs. an exact solver, not a defect requiring a fix.
 - FR-004: System outputs a recommended packing order as a lightweight grid/diagram plus text (not full 2D/3D rendering) for the goods that fit. Priority: must-have
-  > Socrates: Counter-argument considered: "text alone is hard to trust or execute without any visual reference." Resolution: revised — output includes a simple grid/ASCII-style diagram alongside the text order, short of the full 2D/3D visualization already cut from MVP scope in Phase 3.
+  > Socrates: Counter-argument considered: "text alone is hard to trust or execute without any visual reference." Resolution: revised — output includes a simple grid/ASCII-style diagram alongside the text order, short of the full 2D/3D visualization already cut from MVP scope.
 - FR-005: System shows the volume utilization percentage of the loaded vehicle, explicitly labeled as volume-only. Priority: must-have
-  > Socrates: Counter-argument considered: "volume-only utilization can mislead about weight." Resolution: kept, with an explicit "volume-only" label added to the output so the number isn't mistaken for a weight-inclusive metric. Superseded 2026-09-11: weight utilization is no longer a v2 addition — see FR-011, which reports it as its own separate percentage alongside this one.
+  > Socrates: Counter-argument considered: "volume-only utilization can mislead about weight." Resolution: kept, with an explicit "volume-only" label added to the output so the number isn't mistaken for a weight-inclusive metric. Superseded 2026-09-11: weight utilization is reported as its own separate percentage — see FR-011.
 - FR-006: If the goods don't fit in one vehicle, system reports the exact number of additional trips/vehicles needed. Priority: nice-to-have
   > Socrates: Counter-argument considered: "computing an exact trip count is itself a non-trivial repeated bin-packing problem — a bare 'doesn't fit' might be enough for v1." Resolution: demoted to nice-to-have; the must-have baseline is simply reporting that the goods don't fit in one trip (already covered by FR-003's fit determination), with the precise count as a stretch/nice-to-have.
 - FR-009: A "fits" result requires both the volume-based packing arrangement to succeed AND the total goods weight to not exceed the vehicle's maximum payload — weight is a hard cap on feasibility, not just an ordering concern. Priority: must-have
@@ -122,11 +95,15 @@ The rule consumes user-facing inputs: a list of goods (each with dimensions, wei
 
 The user encounters this rule as the core result of the primary flow (US-01): after entering goods and a vehicle, they submit once and receive the calculated answer — not a manual trial-and-error process.
 
+## Access Control
+
+Login required (email/password, OAuth, or passwordless — specific mechanism is a downstream tech-stack decision, not a product decision). Flat user model: every logged-in user sees the same thing and has the same capabilities. No admin/member/guest role split for the MVP.
+
 ## Non-Goals
 
-- **No 2D/3D visual load rendering.** The packing order is communicated as text plus a lightweight grid diagram (FR-004), not a full visual/3D renderer. Cut during the Phase 3 timeline-cost check; explicit v2 candidate.
-- **No multi-vehicle fleet assignment or managing multiple simultaneous loads.** The locked persona (Phase 1) is one person planning one run on one vehicle at a time — assigning goods across a fleet of vehicles is out of scope for this MVP.
+- **No 2D/3D visual load rendering.** The packing order is communicated as text plus a lightweight grid diagram (FR-004), not a full visual/3D renderer. Explicit v2 candidate.
+- **No multi-vehicle fleet assignment or managing multiple simultaneous loads.** The locked persona is one person planning one run on one vehicle at a time — assigning goods across a fleet of vehicles is out of scope for this MVP.
 
 ## Open Questions
 
-_(none — quality cross-check passed with no gaps; the weight/max-load scope reversal on 2026-09-11 was fully resolved through direct user decisions, not left open)_
+_(none — quality cross-check passed with no gaps; the weight/max-load scope reversal and the FR-007 unit-of-reuse correction on 2026-09-11 were fully resolved through direct user decisions, not left open)_

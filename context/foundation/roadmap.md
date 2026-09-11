@@ -4,7 +4,7 @@ version: 1
 status: draft
 created: 2026-09-09
 updated: 2026-09-11
-prd_version: 2
+prd_version: 3
 main_goal: low-complexity
 top_blocker: capacity
 milestone_id: save-and-reuse
@@ -23,8 +23,8 @@ milestone_status: open
 **M-2: Save and reuse** — Status: open
 
 - **Intent:** Let a user skip re-entering data on repeat fit checks by saving and reusing both vehicle profiles and goods lists. The two capabilities are independent, parallelizable slices, but the milestone's real value — a fit check run entirely from previously saved data, no manual re-entry — only lands once both are done.
-- **Source materials:** `context/foundation/prd-v2.md` (v2). Scope unchanged from the original v1-sourced generation — FR-007/FR-008 wording is identical in v2, so S-01/S-02 carry forward as-is. v2 also adds FR-009/010/011 (weight-aware fit checking), which is a distinct outcome unrelated to save/reuse — see `## Parked`.
-- **Done when:** S-01 and S-02 are both `done` — a logged-in user can save a vehicle profile and a goods list from the fit-check page, and on a later visit run a full fit check by selecting both from saved data instead of typing them in again.
+- **Source materials:** `context/foundation/prd-v3.md` (v3). v3 corrects FR-007's unit of reuse from a whole goods list to a single reusable goods-item template (mirroring FR-008's vehicle-profile pattern) — see the `## Slices` entry for S-02 below. v2 also added FR-009/010/011 (weight-aware fit checking), which is a distinct outcome unrelated to save/reuse — see `## Parked`.
+- **Done when:** S-01 and S-02 are both `done` — a logged-in user can save a vehicle profile and a goods item template from the fit-check page, and on a later visit run a full fit check by selecting/loading both from saved data instead of typing them in again.
 - **Scope anchors:** FR-007, FR-008.
 
 ## Vision recap
@@ -42,7 +42,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 | ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
 | S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | done |
-| S-02 | `save-goods-list`      | Save the current goods list as a named set and load it back into the form on a later visit    | —              | FR-007   | planning |
+| S-02 | `save-goods-item`      | Save a single goods item as a reusable template (label, dimensions, rotatable, stackable) and load it into the form on a later visit | —              | FR-007   | planning |
 
 ## Baseline
 
@@ -74,16 +74,16 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 - **Risk:** This is the app's first persistence-backed feature — even though the schema itself is small (one table: id, user, label, dimensions), this slice sets the RLS/migration pattern every later persistence feature will follow, so getting the per-user access-control policy right here matters more than the feature's small surface suggests.
 - **Status:** done
 
-### S-02: User saves a goods list and reuses it in a later fit check
+### S-02: User saves a goods item as a reusable template and reuses it in a later fit check
 
-- **Outcome:** user can save the current goods list — all line items — as a named set from the fit-check page, and load a previously saved list back into the form on a later visit instead of re-entering every item.
-- **Change ID:** `save-goods-list`
+- **Outcome:** user can save a single goods item — label, dimensions, whether it can be rotated, whether other items can be stacked on it — as a reusable template from the fit-check page, and load a previously saved item template into the form on a later visit instead of re-entering its fields, mirroring S-01's vehicle-profile pattern applied to one goods item at a time.
+- **Change ID:** `save-goods-item`
 - **PRD refs:** FR-007
 - **Prerequisites:** — (same reasoning as S-01: Auth present, fit-check page already done, this slice owns its own schema)
 - **Parallel with:** S-01
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** More schema surface than S-01 — a saved list holds multiple items, not one flat row, so the child-table-vs-JSONB-column tradeoff needs a deliberate call during `/10x-plan` (affects how easily individual saved items can be edited later). Doesn't block sequencing; just a design decision to make explicitly rather than default into.
+- **Risk:** Low, now that scope is corrected to mirror S-01 directly (one flat row per saved item, same shape of table/RLS/API/UI). Original plan built a list-shaped (`items jsonb`) version against a misread of FR-007; that implementation was discarded (branch reset, orphaned table dropped) before any UI shipped, so no migration/rollback debt carries forward. Re-plan via `/10x-plan` needs a fresh decision on exact saved-item fields (e.g. whether `quantity` is part of the template) and the "Load" interaction (new row vs. fill selected row).
 - **Status:** planning
 
 ## Backlog Handoff
@@ -91,7 +91,7 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 | Roadmap ID | Change ID              | Suggested issue title                                          | Ready for `/10x-plan` | Notes |
 | ---------- | ----------------------- | ------------------------------------------------------------- | ---------------------- | ----- |
 | S-01       | `save-vehicle-profile`  | Save & reuse vehicle profile on the fit-check page             | yes                    | Run `/10x-plan save-vehicle-profile` |
-| S-02       | `save-goods-list`       | Save & reuse goods list on the fit-check page                  | yes                    | Run `/10x-plan save-goods-list` |
+| S-02       | `save-goods-item`       | Save & reuse a goods item template on the fit-check page        | yes                    | Run `/10x-plan save-goods-item` |
 
 Each Change ID above is implemented on its own branch of the same name, created when `/10x-implement` starts and merged back to `master` locally once the change is complete — see CLAUDE.md's "Git workflow for changes".
 
