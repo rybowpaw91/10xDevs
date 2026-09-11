@@ -251,31 +251,31 @@ Additive only — a new table with no existing data to migrate. Rolling back mea
 
 #### Automated
 
-- [x] 1.1 `npx supabase start` succeeds and the migration applies cleanly
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 Type checking passes with new `GoodsItemTemplate` type and schema in place
-- [x] 1.4 `npm run test` passes, including new `goodsItemTemplateInputSchema` unit tests
+- [x] 1.1 `npx supabase start` succeeds and the migration applies cleanly — 003c86e
+- [x] 1.2 `npm run lint` passes — 003c86e
+- [x] 1.3 Type checking passes with new `GoodsItemTemplate` type and schema in place — 003c86e
+- [x] 1.4 `npm run test` passes, including new `goodsItemTemplateInputSchema` unit tests — 003c86e
 
 #### Manual
 
-- [x] 1.5 RLS enabled with exactly the three documented policies, each scoped `to authenticated`
+- [x] 1.5 RLS enabled with exactly the three documented policies, each scoped `to authenticated` — 003c86e
 
 ### Phase 2: Goods Item Templates API Routes
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 Type checking passes
-- [ ] 2.3 `npm run build` succeeds with the new routes present
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 Type checking passes
+- [x] 2.3 `npm run build` succeeds with the new routes present
 
 #### Manual
 
-- [ ] 2.4 Authenticated POST creates a template (201 + created row)
-- [ ] 2.5 Authenticated GET lists the created template
-- [ ] 2.6 Authenticated DELETE removes it; subsequent GET confirms removal
-- [ ] 2.7 Invalid POST body returns 400 with a clear message
-- [ ] 2.8 Unauthenticated request is redirected/rejected
-- [ ] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
+- [x] 2.4 Authenticated POST creates a template (201 + created row)
+- [x] 2.5 Authenticated GET lists the created template
+- [x] 2.6 Authenticated DELETE removes it; subsequent GET confirms removal
+- [x] 2.7 Invalid POST body returns 400 with a clear message
+- [x] 2.8 Unauthenticated request is redirected/rejected
+- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
 
 ### Phase 3: UI Integration (Fit-Check Form)
 
