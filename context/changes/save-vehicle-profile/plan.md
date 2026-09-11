@@ -189,6 +189,14 @@ Wire saved profiles into the existing vehicle-input UI on the fit-check page: fe
 
 **Contract**: A compact list (one row per saved profile: label + dimensions + a delete/trash `Button`), styled consistently with the existing goods-row cards. Deleting calls `DELETE /api/vehicle-profiles/<id>` and removes the row from `savedProfiles` on success; a confirmation is not required (low-stakes, easily re-saved data).
 
+#### 5. Dashboard navigation link (in-session addition)
+
+**File**: `src/pages/fit-check.astro`
+
+**Intent**: Give the user a way back to `/dashboard` (and from there, sign-out) — surfaced during Phase 3 manual testing when the tester had no way to navigate off the fit-check page. Not in the original phase scope; documented here after the fact per impl-review finding F1.
+
+**Contract**: A small link to `/dashboard` near the top of the page.
+
 ### Success Criteria:
 
 #### Automated Verification:

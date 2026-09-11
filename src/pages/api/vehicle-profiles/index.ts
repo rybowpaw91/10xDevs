@@ -21,6 +21,10 @@ function jsonResponse(body: unknown, status: number): Response {
 }
 
 export const GET: APIRoute = async (context) => {
+  if (!context.locals.user) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
     return jsonResponse({ error: "Supabase is not configured" }, 500);

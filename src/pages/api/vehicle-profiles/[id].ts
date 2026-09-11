@@ -14,6 +14,10 @@ function jsonResponse(body: unknown, status: number): Response {
 }
 
 export const DELETE: APIRoute = async (context) => {
+  if (!context.locals.user) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
   const parsedId = idSchema.safeParse(context.params.id);
   if (!parsedId.success) {
     return jsonResponse({ error: "Invalid profile id." }, 400);
