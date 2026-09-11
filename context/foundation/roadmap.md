@@ -41,7 +41,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
-| S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | ready  |
+| S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | in-progress |
 | S-02 | `save-goods-list`      | Save the current goods list as a named set and load it back into the form on a later visit    | —              | FR-007   | ready  |
 
 ## Baseline
@@ -72,7 +72,7 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This is the app's first persistence-backed feature — even though the schema itself is small (one table: id, user, label, dimensions), this slice sets the RLS/migration pattern every later persistence feature will follow, so getting the per-user access-control policy right here matters more than the feature's small surface suggests.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-02: User saves a goods list and reuses it in a later fit check
 
