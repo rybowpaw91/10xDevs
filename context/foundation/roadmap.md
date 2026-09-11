@@ -42,7 +42,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 | ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
 | S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | done |
-| S-02 | `save-goods-item`      | Save a single goods item as a reusable template (label, dimensions, rotatable, stackable) and load it into the form on a later visit | —              | FR-007   | planning |
+| S-02 | `save-goods-item`      | Save a single goods item as a reusable template (label, dimensions, rotatable, stackable) and load it into the form on a later visit | —              | FR-007   | in-progress |
 
 ## Baseline
 
@@ -83,8 +83,8 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 - **Parallel with:** S-01
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Low, now that scope is corrected to mirror S-01 directly (one flat row per saved item, same shape of table/RLS/API/UI). Original plan built a list-shaped (`items jsonb`) version against a misread of FR-007; that implementation was discarded (branch reset, orphaned table dropped) before any UI shipped, so no migration/rollback debt carries forward. Re-plan via `/10x-plan` needs a fresh decision on exact saved-item fields (e.g. whether `quantity` is part of the template) and the "Load" interaction (new row vs. fill selected row).
-- **Status:** planning
+- **Risk:** Low, now that scope is corrected to mirror S-01 directly (one flat row per saved item, same shape of table/RLS/API/UI). Original plan built a list-shaped (`items jsonb`) version against a misread of FR-007; that implementation was discarded (branch reset, orphaned table dropped) before any UI shipped, so no migration/rollback debt carries forward. Re-planned via `/10x-plan`: template excludes `quantity`, "Load" appends a new row.
+- **Status:** in-progress
 
 ## Backlog Handoff
 

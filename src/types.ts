@@ -57,3 +57,13 @@ export interface VehicleProfile {
   width: number;
   height: number;
 }
+
+export interface GoodsItemTemplate {
+  id: string;
+  label: string;
+  length: number;
+  width: number;
+  height: number;
+  rotatable: boolean;
+  stackable: boolean;
+}

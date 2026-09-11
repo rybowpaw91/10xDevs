@@ -251,14 +251,14 @@ Additive only — a new table with no existing data to migrate. Rolling back mea
 
 #### Automated
 
-- [ ] 1.1 `npx supabase start` succeeds and the migration applies cleanly
-- [ ] 1.2 `npm run lint` passes
-- [ ] 1.3 Type checking passes with new `GoodsItemTemplate` type and schema in place
-- [ ] 1.4 `npm run test` passes, including new `goodsItemTemplateInputSchema` unit tests
+- [x] 1.1 `npx supabase start` succeeds and the migration applies cleanly
+- [x] 1.2 `npm run lint` passes
+- [x] 1.3 Type checking passes with new `GoodsItemTemplate` type and schema in place
+- [x] 1.4 `npm run test` passes, including new `goodsItemTemplateInputSchema` unit tests
 
 #### Manual
 
-- [ ] 1.5 RLS enabled with exactly the three documented policies, each scoped `to authenticated`
+- [x] 1.5 RLS enabled with exactly the three documented policies, each scoped `to authenticated`
 
 ### Phase 2: Goods Item Templates API Routes
 
