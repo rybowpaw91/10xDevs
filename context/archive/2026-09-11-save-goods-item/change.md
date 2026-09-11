@@ -1,10 +1,10 @@
 ---
 change_id: save-goods-item
 title: Save goods item
-status: impl_reviewed
+status: archived
 created: 2026-09-11
 updated: 2026-09-11
-archived_at: null
+archived_at: 2026-09-11T19:22:02Z
 ---
 
 ## Notes

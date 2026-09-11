@@ -42,7 +42,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 | ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
 | S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | done |
-| S-02 | `save-goods-item`      | Save a single goods item as a reusable template (label, dimensions, rotatable, stackable) and load it into the form on a later visit | —              | FR-007   | in-progress |
+| S-02 | `save-goods-item`      | Save a single goods item as a reusable template (label, dimensions, rotatable, stackable) and load it into the form on a later visit | —              | FR-007   | done |
 
 ## Baseline
 
@@ -84,7 +84,7 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Low, now that scope is corrected to mirror S-01 directly (one flat row per saved item, same shape of table/RLS/API/UI). Original plan built a list-shaped (`items jsonb`) version against a misread of FR-007; that implementation was discarded (branch reset, orphaned table dropped) before any UI shipped, so no migration/rollback debt carries forward. Re-planned via `/10x-plan`: template excludes `quantity`, "Load" appends a new row.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -105,7 +105,7 @@ _None._ The PRD's own `## Open Questions` section reported none, and this milest
 - **No 2D/3D visual load rendering.** Why parked: PRD Non-Goal — cut during MVP scoping after a timeline-cost check; explicit v2 candidate.
 - **Weight-aware fit checking (FR-009, FR-010, FR-011 in `prd-v2.md`).** Why parked: no longer a PRD Non-Goal as of v2 — promoted to must-have — but not folded into M-2 because it's a distinct outcome (extends the core fit-check from M-1: a hard weight-capacity cap on feasibility, a heavier-below-lighter packing-order rule, and a weight-utilization percentage) unrelated to save/reuse, M-2's actual theme. User-confirmed sequencing (2026-09-11): open as its own milestone (M-3) immediately after M-2 closes.
 - **No multi-vehicle fleet assignment or managing multiple simultaneous loads.** Why parked: PRD Non-Goal — the locked persona plans one vehicle, one load, one trip at a time.
-- **Apply the same in-dropdown delete UX to the saved vehicle-profile select (S-01).** Why parked: user feedback during S-02 (`save-goods-item`) Phase 3 manual testing (2026-09-11) asked for saved goods-item templates to be deletable via a small icon button inside their dropdown option, instead of a separate management list — S-01's vehicle-profile select still uses the older separate-list pattern. Not implemented as part of S-02 (out of scope, S-01 is already shipped/archived); candidate for a small follow-up change for UI consistency across both saved-entity types. See `context/changes/save-goods-item/change.md` Notes.
+- **Apply the same in-dropdown delete UX to the saved vehicle-profile select (S-01).** Why parked: user feedback during S-02 (`save-goods-item`) Phase 3 manual testing (2026-09-11) asked for saved goods-item templates to be deletable via a small icon button inside their dropdown option, instead of a separate management list — S-01's vehicle-profile select still uses the older separate-list pattern. Not implemented as part of S-02 (out of scope, S-01 is already shipped/archived); candidate for a small follow-up change for UI consistency across both saved-entity types. See `context/archive/2026-09-11-save-goods-item/change.md` Notes.
 
 ## Milestone History
 
@@ -115,3 +115,4 @@ _None._ The PRD's own `## Open Questions` section reported none, and this milest
 
 - **S-01: user can enter a goods list (dimensions, quantity, rotation and stackable flags per item) and a vehicle's cargo dimensions, submit once, and see whether everything fits, a recommended packing order (text + lightweight grid), and the volume-utilization percentage.** — Archived 2026-09-10 → `context/archive/2026-09-09-single-trip-fit-check/`. Lesson: —.
 - **S-01: user can save a vehicle's cargo dimensions as a named profile from the fit-check page, and select that saved profile — alongside the existing hardcoded presets and manual entry — on a later visit to prefill the vehicle fields.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-vehicle-profile/`. Lesson: —.
+- **S-02: user can save a single goods item — label, dimensions, whether it can be rotated, whether other items can be stacked on it — as a reusable template from the fit-check page, and load a previously saved item template into the form on a later visit instead of re-entering its fields, mirroring S-01's vehicle-profile pattern applied to one goods item at a time.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-goods-item/`. Lesson: —.
