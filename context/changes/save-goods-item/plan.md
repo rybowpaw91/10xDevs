@@ -281,15 +281,15 @@ Additive only — a new table with no existing data to migrate. Rolling back mea
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 Type checking passes
-- [x] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run lint` passes — 9df39a3
+- [x] 3.2 Type checking passes — 9df39a3
+- [x] 3.3 `npm run build` succeeds — 9df39a3
 
 #### Manual
 
-- [x] 3.4 Saving a row adds it to the management list
-- [x] 3.5 Loading appends a new row with dimensions/rotatable/stackable intact and quantity defaulted to 1
-- [x] 3.6 Loading with pre-existing rows appends rather than overwrites
-- [x] 3.7 Deleting removes the template from the management list
-- [x] 3.8 Duplicate labels allowed
-- [x] 3.9 Signed-out visit still redirects to sign-in
+- [x] 3.4 Saving a row adds it to the management list — 9df39a3
+- [x] 3.5 Loading appends a new row with dimensions/rotatable/stackable intact and quantity defaulted to 1 — 9df39a3
+- [x] 3.6 Loading with pre-existing rows appends rather than overwrites — 9df39a3
+- [x] 3.7 Deleting removes the template from the management list — 9df39a3
+- [x] 3.8 Duplicate labels allowed — 9df39a3
+- [x] 3.9 Signed-out visit still redirects to sign-in — 9df39a3
