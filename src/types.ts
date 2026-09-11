@@ -49,3 +49,11 @@ export interface FitCheckResult {
   layers: LayerGrid[];
   utilizationPercent: number;
 }
+
+export interface VehicleProfile {
+  id: string;
+  label: string;
+  length: number;
+  width: number;
+  height: number;
+}
