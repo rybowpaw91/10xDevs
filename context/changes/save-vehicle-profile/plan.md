@@ -266,31 +266,31 @@ Additive only — a new table with no existing data to migrate. Rolling back mea
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 Type checking passes
-- [x] 2.3 `npm run build` succeeds with the new routes present
+- [x] 2.1 `npm run lint` passes — 0496477
+- [x] 2.2 Type checking passes — 0496477
+- [x] 2.3 `npm run build` succeeds with the new routes present — 0496477
 
 #### Manual
 
-- [x] 2.4 Authenticated POST creates a profile (201 + created row)
-- [x] 2.5 Authenticated GET lists the created profile
-- [x] 2.6 Authenticated DELETE removes it; subsequent GET confirms removal
-- [x] 2.7 Invalid POST body returns 400 with a clear message
-- [x] 2.8 Unauthenticated request is redirected/rejected
-- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
+- [x] 2.4 Authenticated POST creates a profile (201 + created row) — 0496477
+- [x] 2.5 Authenticated GET lists the created profile — 0496477
+- [x] 2.6 Authenticated DELETE removes it; subsequent GET confirms removal — 0496477
+- [x] 2.7 Invalid POST body returns 400 with a clear message — 0496477
+- [x] 2.8 Unauthenticated request is redirected/rejected — 0496477
+- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance — 0496477
 
 ### Phase 3: UI Integration (Fit-Check Form)
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 Type checking passes
-- [ ] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 Type checking passes
+- [x] 3.3 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 3.4 Saving adds the profile to both the select group and the management list
-- [ ] 3.5 Selecting a saved profile prefills editable fields
-- [ ] 3.6 Deleting removes the profile from both places
-- [ ] 3.7 Duplicate labels allowed and visually distinguishable by dimensions
-- [ ] 3.8 Signed-out visit still redirects to sign-in
+- [x] 3.4 Saving adds the profile to both the select group and the management list
+- [x] 3.5 Selecting a saved profile prefills editable fields
+- [x] 3.6 Deleting removes the profile from both places
+- [x] 3.7 Duplicate labels allowed and visually distinguishable by dimensions
+- [x] 3.8 Signed-out visit still redirects to sign-in

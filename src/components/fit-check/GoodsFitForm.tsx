@@ -1,14 +1,23 @@
-import { useRef, useState } from "react";
-import { Plus, Trash2, PackageCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Plus, Trash2, PackageCheck, Save } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { VEHICLE_PRESETS } from "@/lib/constants/vehicle-presets";
 import { fitCheckRequestSchema } from "@/lib/validation/fit-check-schema";
-import type { FitCheckRequest, FitCheckResult, VehicleDimensionsInput } from "@/types";
+import { vehicleProfileInputSchema } from "@/lib/validation/vehicle-profile-schema";
+import type { FitCheckRequest, FitCheckResult, VehicleDimensionsInput, VehicleProfile } from "@/types";
 import { FitCheckResultView } from "./FitCheckResult";
 
 interface GoodsRowState {
@@ -103,6 +112,31 @@ export default function GoodsFitForm() {
   const [result, setResult] = useState<FitCheckResult | null>(null);
   const [resultVehicle, setResultVehicle] = useState<VehicleDimensionsInput | null>(null);
 
+  const [savedProfiles, setSavedProfiles] = useState<VehicleProfile[]>([]);
+  const [profileLabel, setProfileLabel] = useState("");
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfiles() {
+      try {
+        const response = await fetch("/api/vehicle-profiles");
+        if (!response.ok) return;
+        const data = (await response.json()) as VehicleProfile[];
+        if (!cancelled) setSavedProfiles(data);
+      } catch {
+        // Saved profiles are a convenience, not required for the core flow — fail silently.
+      }
+    }
+
+    void loadProfiles();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   function addRow() {
     const id = nextRowId.current;
     nextRowId.current += 1;
@@ -119,12 +153,64 @@ export default function GoodsFitForm() {
 
   function handlePresetChange(presetId: string) {
     const preset = VEHICLE_PRESETS.find((candidate) => candidate.id === presetId);
+    const profile = savedProfiles.find((candidate) => candidate.id === presetId);
+    const source = preset ?? profile;
     setVehicle((prev) => ({
       presetId,
-      length: preset ? String(preset.length) : prev.length,
-      width: preset ? String(preset.width) : prev.width,
-      height: preset ? String(preset.height) : prev.height,
+      length: source ? String(source.length) : prev.length,
+      width: source ? String(source.width) : prev.width,
+      height: source ? String(source.height) : prev.height,
     }));
+  }
+
+  async function saveProfile() {
+    setProfileError(null);
+
+    const parsed = vehicleProfileInputSchema.safeParse({
+      label: profileLabel.trim(),
+      length: Number(vehicle.length),
+      width: Number(vehicle.width),
+      height: Number(vehicle.height),
+    });
+    if (!parsed.success) {
+      setProfileError(collectZodErrors(z.treeifyError(parsed.error)).join(" "));
+      return;
+    }
+
+    setSavingProfile(true);
+    try {
+      const response = await fetch("/api/vehicle-profiles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!response.ok) {
+        setProfileError(`Could not save profile (status ${response.status}).`);
+        return;
+      }
+
+      const created = (await response.json()) as VehicleProfile;
+      setSavedProfiles((prev) => [created, ...prev]);
+      setProfileLabel("");
+    } catch {
+      setProfileError("Could not reach the server. Please try again.");
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function deleteProfile(id: string) {
+    try {
+      const response = await fetch(`/api/vehicle-profiles/${id}`, { method: "DELETE" });
+      if (!response.ok) return;
+      setSavedProfiles((prev) => prev.filter((profile) => profile.id !== id));
+      if (vehicle.presetId === id) {
+        setVehicle((prev) => ({ ...prev, presetId: "custom" }));
+      }
+    } catch {
+      // Best-effort — leave the list as-is if the request fails.
+    }
   }
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
@@ -183,11 +269,24 @@ export default function GoodsFitForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="custom">Custom / manual entry</SelectItem>
-                  {VEHICLE_PRESETS.map((preset) => (
-                    <SelectItem key={preset.id} value={preset.id}>
-                      {preset.label} ({preset.length}x{preset.width}x{preset.height} cm)
-                    </SelectItem>
-                  ))}
+                  {savedProfiles.length > 0 && (
+                    <SelectGroup>
+                      <SelectLabel>Saved profiles</SelectLabel>
+                      {savedProfiles.map((profile) => (
+                        <SelectItem key={profile.id} value={profile.id}>
+                          {profile.label} ({profile.length}x{profile.width}x{profile.height} cm)
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  )}
+                  <SelectGroup>
+                    <SelectLabel>Presets</SelectLabel>
+                    {VEHICLE_PRESETS.map((preset) => (
+                      <SelectItem key={preset.id} value={preset.id}>
+                        {preset.label} ({preset.length}x{preset.width}x{preset.height} cm)
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
@@ -228,6 +327,57 @@ export default function GoodsFitForm() {
               />
             </div>
           </div>
+
+          <div className="mt-3 flex flex-wrap items-end gap-3">
+            <div className="min-w-48 flex-1">
+              <Label className="mb-1 text-blue-100/80">Save current as profile</Label>
+              <Input
+                value={profileLabel}
+                onChange={(e) => {
+                  setProfileLabel(e.target.value);
+                }}
+                placeholder="e.g. My delivery van"
+                className="bg-white/10 text-white"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={savingProfile}
+              onClick={() => {
+                void saveProfile();
+              }}
+            >
+              <Save className="size-4" />
+              Save profile
+            </Button>
+          </div>
+          {profileError && <p className="mt-2 text-sm text-red-300">{profileError}</p>}
+
+          {savedProfiles.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {savedProfiles.map((profile) => (
+                <div
+                  key={profile.id}
+                  className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-blue-100/80"
+                >
+                  <span>
+                    {profile.label} — {profile.length}x{profile.width}x{profile.height} cm
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-red-300 hover:text-red-200"
+                    onClick={() => {
+                      void deleteProfile(profile.id);
+                    }}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section>
