@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Plus, Trash2, PackageCheck, Save } from "lucide-react";
+import { Select as SelectPrimitive } from "radix-ui";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -16,8 +17,15 @@ import {
 } from "@/components/ui/select";
 import { VEHICLE_PRESETS } from "@/lib/constants/vehicle-presets";
 import { fitCheckRequestSchema } from "@/lib/validation/fit-check-schema";
+import { goodsItemTemplateInputSchema } from "@/lib/validation/goods-item-template-schema";
 import { vehicleProfileInputSchema } from "@/lib/validation/vehicle-profile-schema";
-import type { FitCheckRequest, FitCheckResult, VehicleDimensionsInput, VehicleProfile } from "@/types";
+import type {
+  FitCheckRequest,
+  FitCheckResult,
+  GoodsItemTemplate,
+  VehicleDimensionsInput,
+  VehicleProfile,
+} from "@/types";
 import { FitCheckResultView } from "./FitCheckResult";
 
 interface GoodsRowState {
@@ -117,6 +125,11 @@ export default function GoodsFitForm() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
 
+  const [savedItemTemplates, setSavedItemTemplates] = useState<GoodsItemTemplate[]>([]);
+  const [itemTemplateError, setItemTemplateError] = useState<string | null>(null);
+  const [savingItemTemplateKey, setSavingItemTemplateKey] = useState<string | null>(null);
+  const [templateSelectValue, setTemplateSelectValue] = useState("");
+
   useEffect(() => {
     let cancelled = false;
 
@@ -132,6 +145,26 @@ export default function GoodsFitForm() {
     }
 
     void loadProfiles();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadItemTemplates() {
+      try {
+        const response = await fetch("/api/goods-item-templates");
+        if (!response.ok) return;
+        const data = (await response.json()) as GoodsItemTemplate[];
+        if (!cancelled) setSavedItemTemplates(data);
+      } catch {
+        // Saved item templates are a convenience, not required for the core flow — fail silently.
+      }
+    }
+
+    void loadItemTemplates();
     return () => {
       cancelled = true;
     };
@@ -208,6 +241,80 @@ export default function GoodsFitForm() {
       if (vehicle.presetId === id) {
         setVehicle((prev) => ({ ...prev, presetId: "custom" }));
       }
+    } catch {
+      // Best-effort — leave the list as-is if the request fails.
+    }
+  }
+
+  async function saveItemTemplate(row: GoodsRowState) {
+    setItemTemplateError(null);
+
+    const parsed = goodsItemTemplateInputSchema.safeParse({
+      label: row.label.trim(),
+      length: Number(row.length),
+      width: Number(row.width),
+      height: Number(row.height),
+      rotatable: row.rotatable,
+      stackable: row.stackable,
+    });
+    if (!parsed.success) {
+      setItemTemplateError(collectZodErrors(z.treeifyError(parsed.error)).join(" "));
+      return;
+    }
+
+    setSavingItemTemplateKey(row.key);
+    try {
+      const response = await fetch("/api/goods-item-templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!response.ok) {
+        setItemTemplateError(`Could not save item template (status ${response.status}).`);
+        return;
+      }
+
+      const created = (await response.json()) as GoodsItemTemplate;
+      setSavedItemTemplates((prev) => [created, ...prev]);
+    } catch {
+      setItemTemplateError("Could not reach the server. Please try again.");
+    } finally {
+      setSavingItemTemplateKey(null);
+    }
+  }
+
+  function loadItemTemplate(template: GoodsItemTemplate) {
+    const id = nextRowId.current;
+    nextRowId.current += 1;
+    setRows((prev) => [
+      ...prev,
+      {
+        key: `row-${id}`,
+        label: template.label,
+        length: String(template.length),
+        width: String(template.width),
+        height: String(template.height),
+        quantity: "1",
+        rotatable: template.rotatable,
+        stackable: template.stackable,
+      },
+    ]);
+  }
+
+  function handleTemplateSelect(templateId: string) {
+    const template = savedItemTemplates.find((candidate) => candidate.id === templateId);
+    if (template) {
+      loadItemTemplate(template);
+    }
+    setTemplateSelectValue("");
+  }
+
+  async function deleteItemTemplate(id: string) {
+    try {
+      const response = await fetch(`/api/goods-item-templates/${id}`, { method: "DELETE" });
+      if (!response.ok) return;
+      setSavedItemTemplates((prev) => prev.filter((template) => template.id !== id));
     } catch {
       // Best-effort — leave the list as-is if the request fails.
     }
@@ -381,13 +488,54 @@ export default function GoodsFitForm() {
         </section>
 
         <section>
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-white">Goods list</h2>
-            <Button type="button" variant="outline" onClick={addRow}>
-              <Plus className="size-4" />
-              Add item
-            </Button>
+            <div className="flex items-center gap-2">
+              {savedItemTemplates.length > 0 && (
+                <Select value={templateSelectValue} onValueChange={handleTemplateSelect}>
+                  <SelectTrigger className="w-56 bg-white/10 text-white">
+                    <SelectValue placeholder="Add from saved item" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Saved items</SelectLabel>
+                      {savedItemTemplates.map((template) => (
+                        <SelectPrimitive.Item
+                          key={template.id}
+                          value={template.id}
+                          className="focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default items-center justify-between gap-2 rounded-sm py-1.5 pr-2 pl-2 text-sm outline-hidden select-none"
+                        >
+                          <SelectPrimitive.ItemText>
+                            {template.label} ({template.length}x{template.width}x{template.height} cm)
+                          </SelectPrimitive.ItemText>
+                          <button
+                            type="button"
+                            aria-label={`Delete ${template.label}`}
+                            className="text-red-300 hover:text-red-200"
+                            onPointerDown={(e) => {
+                              e.stopPropagation();
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              void deleteItemTemplate(template.id);
+                            }}
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </SelectPrimitive.Item>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+              <Button type="button" variant="outline" onClick={addRow}>
+                <Plus className="size-4" />
+                Add item
+              </Button>
+            </div>
           </div>
+
+          {itemTemplateError && <p className="mb-3 text-sm text-red-300">{itemTemplateError}</p>}
 
           <div className="space-y-3">
             {rows.map((row) => (
@@ -474,7 +622,19 @@ export default function GoodsFitForm() {
                   <Button
                     type="button"
                     variant="ghost"
-                    className="ml-auto text-red-300 hover:text-red-200"
+                    className="ml-auto"
+                    title="Save as template"
+                    disabled={savingItemTemplateKey === row.key}
+                    onClick={() => {
+                      void saveItemTemplate(row);
+                    }}
+                  >
+                    <Save className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-red-300 hover:text-red-200"
                     disabled={rows.length <= 1}
                     onClick={() => {
                       removeRow(row.key);

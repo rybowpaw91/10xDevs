@@ -264,32 +264,32 @@ Additive only — a new table with no existing data to migrate. Rolling back mea
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 Type checking passes
-- [x] 2.3 `npm run build` succeeds with the new routes present
+- [x] 2.1 `npm run lint` passes — d705b5f
+- [x] 2.2 Type checking passes — d705b5f
+- [x] 2.3 `npm run build` succeeds with the new routes present — d705b5f
 
 #### Manual
 
-- [x] 2.4 Authenticated POST creates a template (201 + created row)
-- [x] 2.5 Authenticated GET lists the created template
-- [x] 2.6 Authenticated DELETE removes it; subsequent GET confirms removal
-- [x] 2.7 Invalid POST body returns 400 with a clear message
-- [x] 2.8 Unauthenticated request is redirected/rejected
-- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
+- [x] 2.4 Authenticated POST creates a template (201 + created row) — d705b5f
+- [x] 2.5 Authenticated GET lists the created template — d705b5f
+- [x] 2.6 Authenticated DELETE removes it; subsequent GET confirms removal — d705b5f
+- [x] 2.7 Invalid POST body returns 400 with a clear message — d705b5f
+- [x] 2.8 Unauthenticated request is redirected/rejected — d705b5f
+- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance — d705b5f
 
 ### Phase 3: UI Integration (Fit-Check Form)
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 Type checking passes
-- [ ] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 Type checking passes
+- [x] 3.3 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 3.4 Saving a row adds it to the management list
-- [ ] 3.5 Loading appends a new row with dimensions/rotatable/stackable intact and quantity defaulted to 1
-- [ ] 3.6 Loading with pre-existing rows appends rather than overwrites
-- [ ] 3.7 Deleting removes the template from the management list
-- [ ] 3.8 Duplicate labels allowed
-- [ ] 3.9 Signed-out visit still redirects to sign-in
+- [x] 3.4 Saving a row adds it to the management list
+- [x] 3.5 Loading appends a new row with dimensions/rotatable/stackable intact and quantity defaulted to 1
+- [x] 3.6 Loading with pre-existing rows appends rather than overwrites
+- [x] 3.7 Deleting removes the template from the management list
+- [x] 3.8 Duplicate labels allowed
+- [x] 3.9 Signed-out visit still redirects to sign-in

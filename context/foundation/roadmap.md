@@ -105,6 +105,7 @@ _None._ The PRD's own `## Open Questions` section reported none, and this milest
 - **No 2D/3D visual load rendering.** Why parked: PRD Non-Goal — cut during MVP scoping after a timeline-cost check; explicit v2 candidate.
 - **Weight-aware fit checking (FR-009, FR-010, FR-011 in `prd-v2.md`).** Why parked: no longer a PRD Non-Goal as of v2 — promoted to must-have — but not folded into M-2 because it's a distinct outcome (extends the core fit-check from M-1: a hard weight-capacity cap on feasibility, a heavier-below-lighter packing-order rule, and a weight-utilization percentage) unrelated to save/reuse, M-2's actual theme. User-confirmed sequencing (2026-09-11): open as its own milestone (M-3) immediately after M-2 closes.
 - **No multi-vehicle fleet assignment or managing multiple simultaneous loads.** Why parked: PRD Non-Goal — the locked persona plans one vehicle, one load, one trip at a time.
+- **Apply the same in-dropdown delete UX to the saved vehicle-profile select (S-01).** Why parked: user feedback during S-02 (`save-goods-item`) Phase 3 manual testing (2026-09-11) asked for saved goods-item templates to be deletable via a small icon button inside their dropdown option, instead of a separate management list — S-01's vehicle-profile select still uses the older separate-list pattern. Not implemented as part of S-02 (out of scope, S-01 is already shipped/archived); candidate for a small follow-up change for UI consistency across both saved-entity types. See `context/changes/save-goods-item/change.md` Notes.
 
 ## Milestone History
 
