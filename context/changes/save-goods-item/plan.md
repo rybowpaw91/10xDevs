@@ -186,6 +186,8 @@ Wire saved goods-item templates into the existing goods-list UI on the fit-check
 
 **Contract**: A compact list (one row per saved template: label + dimensions + a "Load" `Button` + a delete/trash `Button`), placed near the goods-list section header, styled consistently with the existing saved-profiles list. "Load" constructs one new `GoodsRowState` from the template (quantity defaults to `"1"`, same as `createRow`), draws its key from the existing `nextRowId` counter (per Critical Implementation Details), and appends it via the same mechanism `addRow` uses — no replacement of existing rows, no confirmation dialog. Delete calls `DELETE /api/goods-item-templates/<id>` and removes the row from `savedItemTemplates` on success.
 
+**Addendum (in-session revision, disclosed during Phase 3 manual testing, documented here after the fact per impl-review finding F2)**: the shipped UI does not use a separate management list. Saved item templates are surfaced via a `<Select>` dropdown next to the "Add item" button (mirroring the vehicle-profile preset select). Picking an option appends a new row exactly as "Load" was specified above. Delete is a small icon button rendered inside each dropdown option (using `onPointerDown`/`onClick` `stopPropagation` so it deletes without also triggering selection, plus an `onKeyDown` handler for `Delete`/`Backspace` as the keyboard-accessible path — see impl-review finding F1). No separate list exists in the final implementation.
+
 ### Success Criteria:
 
 #### Automated Verification:

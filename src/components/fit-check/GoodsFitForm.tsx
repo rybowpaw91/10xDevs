@@ -504,6 +504,15 @@ export default function GoodsFitForm() {
                           key={template.id}
                           value={template.id}
                           className="focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default items-center justify-between gap-2 rounded-sm py-1.5 pr-2 pl-2 text-sm outline-hidden select-none"
+                          // The delete button below is a nested interactive element inside this
+                          // role="option" item, so it isn't Tab-reachable — Delete/Backspace on the
+                          // focused option is the keyboard path to the same action.
+                          onKeyDown={(e) => {
+                            if (e.key === "Delete" || e.key === "Backspace") {
+                              e.preventDefault();
+                              void deleteItemTemplate(template.id);
+                            }
+                          }}
                         >
                           <SelectPrimitive.ItemText>
                             {template.label} ({template.length}x{template.width}x{template.height} cm)
@@ -513,6 +522,9 @@ export default function GoodsFitForm() {
                             aria-label={`Delete ${template.label}`}
                             className="text-red-300 hover:text-red-200"
                             onPointerDown={(e) => {
+                              e.stopPropagation();
+                            }}
+                            onPointerUp={(e) => {
                               e.stopPropagation();
                             }}
                             onClick={(e) => {
