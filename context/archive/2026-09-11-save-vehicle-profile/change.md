@@ -1,10 +1,10 @@
 ---
 change_id: save-vehicle-profile
 title: Save vehicle profile
-status: impl_reviewed
+status: archived
 created: 2026-09-11
 updated: 2026-09-11
-archived_at: null
+archived_at: 2026-09-11T14:34:05Z
 ---
 
 ## Notes

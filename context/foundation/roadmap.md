@@ -41,7 +41,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
-| S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | in-progress |
+| S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | done |
 | S-02 | `save-goods-list`      | Save the current goods list as a named set and load it back into the form on a later visit    | —              | FR-007   | ready  |
 
 ## Baseline
@@ -72,7 +72,7 @@ No Foundations for this milestone. Data is the only absent layer either slice ne
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This is the app's first persistence-backed feature — even though the schema itself is small (one table: id, user, label, dimensions), this slice sets the RLS/migration pattern every later persistence feature will follow, so getting the per-user access-control policy right here matters more than the feature's small surface suggests.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-02: User saves a goods list and reuses it in a later fit check
 
@@ -111,3 +111,4 @@ _None._ The PRD's own `## Open Questions` section reported none, and this milest
 ## Done
 
 - **S-01: user can enter a goods list (dimensions, quantity, rotation and stackable flags per item) and a vehicle's cargo dimensions, submit once, and see whether everything fits, a recommended packing order (text + lightweight grid), and the volume-utilization percentage.** — Archived 2026-09-10 → `context/archive/2026-09-09-single-trip-fit-check/`. Lesson: —.
+- **S-01: user can save a vehicle's cargo dimensions as a named profile from the fit-check page, and select that saved profile — alongside the existing hardcoded presets and manual entry — on a later visit to prefill the vehicle fields.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-vehicle-profile/`. Lesson: —.
