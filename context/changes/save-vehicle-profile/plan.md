@@ -283,14 +283,14 @@ Additive only — a new table with no existing data to migrate. Rolling back mea
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 Type checking passes
-- [x] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run lint` passes — 797477d
+- [x] 3.2 Type checking passes — 797477d
+- [x] 3.3 `npm run build` succeeds — 797477d
 
 #### Manual
 
-- [x] 3.4 Saving adds the profile to both the select group and the management list
-- [x] 3.5 Selecting a saved profile prefills editable fields
-- [x] 3.6 Deleting removes the profile from both places
-- [x] 3.7 Duplicate labels allowed and visually distinguishable by dimensions
-- [x] 3.8 Signed-out visit still redirects to sign-in
+- [x] 3.4 Saving adds the profile to both the select group and the management list — 797477d
+- [x] 3.5 Selecting a saved profile prefills editable fields — 797477d
+- [x] 3.6 Deleting removes the profile from both places — 797477d
+- [x] 3.7 Duplicate labels allowed and visually distinguishable by dimensions — 797477d
+- [x] 3.8 Signed-out visit still redirects to sign-in — 797477d
