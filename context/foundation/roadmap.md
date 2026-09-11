@@ -7,109 +7,98 @@ updated: 2026-09-11
 prd_version: 3
 main_goal: low-complexity
 top_blocker: capacity
-milestone_id: save-and-reuse
-milestone_seq: 2
+milestone_id: weight-aware-loading
+milestone_seq: 3
 milestone_status: open
 ---
 
 # Roadmap: LoadFit
 
-> Derived from `context/foundation/prd-v2.md` (v2) + auto-researched codebase baseline.
+> Derived from `context/foundation/prd-v3.md` (v3) + auto-researched codebase baseline.
 > Edit-in-place; archive when superseded.
 > Slices below are listed in dependency order. The "At a glance" table is the index.
 
 ## Milestone
 
-**M-2: Save and reuse** — Status: open
+**M-3: Weight-aware loading** — Status: open
 
-- **Intent:** Let a user skip re-entering data on repeat fit checks by saving and reusing both vehicle profiles and goods lists. The two capabilities are independent, parallelizable slices, but the milestone's real value — a fit check run entirely from previously saved data, no manual re-entry — only lands once both are done.
-- **Source materials:** `context/foundation/prd-v3.md` (v3). v3 corrects FR-007's unit of reuse from a whole goods list to a single reusable goods-item template (mirroring FR-008's vehicle-profile pattern) — see the `## Slices` entry for S-02 below. v2 also added FR-009/010/011 (weight-aware fit checking), which is a distinct outcome unrelated to save/reuse — see `## Parked`.
-- **Done when:** S-01 and S-02 are both `done` — a logged-in user can save a vehicle profile and a goods item template from the fit-check page, and on a later visit run a full fit check by selecting/loading both from saved data instead of typing them in again.
-- **Scope anchors:** FR-007, FR-008.
+- **Intent:** Extend the core fit-check (M-1) so weight is a first-class feasibility constraint, not just volume — a "fits" result must also respect the vehicle's maximum payload, the packing order must never stack a heavier item above a lighter one, and the user sees a weight-utilization percentage alongside the existing volume-utilization one.
+- **Source materials:** `context/foundation/prd-v3.md` (v3). FR-009/FR-010/FR-011 were added when the user reversed the original MVP scope cut on weight/max-load checking; FR-001 and FR-002 were amended in the same pass to add per-item weight and vehicle maximum payload as inputs. This milestone was explicitly parked for exactly this sequencing point — see M-2's `## Parked` entry (carried into this file's own Milestone History) and the note on FR-009/010/011: "open as its own milestone (M-3) immediately after M-2 closes."
+- **Done when:** S-01 is `done` — a logged-in user can enter each goods item's weight and the vehicle's maximum payload, submit once, and get a fit determination, packing order, and utilization readout that are all weight-aware, not just volume-aware.
+- **Scope anchors:** FR-001 (amended), FR-002 (amended), FR-009, FR-010, FR-011.
 
 ## Vision recap
 
-LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, warehouse staff, and small transport-company owners who plan one vehicle, one load, one trip at a time. M-1 proved the core fit-check hypothesis; this milestone removes the next-biggest friction the PRD names — re-typing the same vehicle and goods list every time the tool is used.
+LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, warehouse staff, and small transport-company owners who plan one vehicle, one load, one trip at a time. M-1 proved the core fit-check hypothesis using volume alone; the PRD's own guardrails are explicit that a "fits" result is only trustworthy once weight is accounted for too — a load can fit by volume and still be over the vehicle's legal payload, and a geometrically-stable stack can still be dangerous if a heavy item sits on a light one.
 
 ## North star
 
-**S-01: User saves a vehicle profile and reuses it in a later fit check** — the PRD's own Socrates dialogue names this exact pain point directly ("ad-hoc entry is repetitive if the same vehicle is reused"), the clearest textual signal in the document for what to build first in this milestone.
+**S-01: Fit check accounts for weight** — the only slice this milestone needs.
 
-> North star — the smallest end-to-end slice whose successful delivery proves the milestone's hypothesis (that saving data removes real re-entry friction). S-01 is placed first because the PRD articulates its pain point most directly, but it has no dependency on S-02 — the two can be built in either order or in parallel, and the milestone's full value requires both.
+> North star — the smallest end-to-end slice whose successful delivery proves the milestone's hypothesis (that treating weight as a hard feasibility constraint, not an afterthought, produces trustworthy results). Here it's also the entire milestone: every FR this milestone covers is tightly coupled enough that there's no smaller meaningful cut.
 
 ## At a glance
 
-| ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites | PRD refs | Status |
-| ---- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
-| S-01 | `save-vehicle-profile` | Save a vehicle's cargo dimensions as a named profile and select it on a later fit check       | —              | FR-008   | done |
-| S-02 | `save-goods-item`      | Save a single goods item as a reusable template (label, dimensions, rotatable, stackable) and load it into the form on a later visit | —              | FR-007   | done |
+| ID   | Change ID              | Outcome (user can …)                                                                                                    | Prerequisites | PRD refs                          | Status |
+| ---- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------------- | ------ |
+| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | ready  |
 
 ## Baseline
 
-What's already in place in the codebase as of `2026-09-10` (auto-researched + user-confirmed; re-checked since M-1 shipped).
-No Foundations below re-scaffold these.
+What's already in place in the codebase as of `2026-09-11` (auto-researched — direct read of the relevant source files during this session, plus confirmation from M-1/M-2's own baselines).
+No Foundations below re-scaffold these; this milestone needs none.
 
-- **Frontend:** partial — Astro 6 + React 19 + Tailwind 4, shadcn set now includes `button`/`input`/`checkbox`/`label`/`select`/`card` (`src/components/ui/`). The fit-check page and form (`src/pages/fit-check.astro`, `src/components/fit-check/`) are the first domain UI pattern this milestone extends.
-- **Backend / API:** partial — first JSON API precedent now exists (`src/pages/api/fit-check.ts`, `prerender = false`, zod-validated) alongside the legacy `formData()` + redirect auth routes. This milestone's endpoints should follow the JSON pattern, not the legacy one.
-- **Data:** absent — `supabase/migrations/` exists but is empty; no ORM/query builder; no persistence entities in `src/types.ts`. `tech-stack.md` names PostgreSQL via Supabase as the chosen provider, just not wired into any domain schema yet.
-- **Auth:** present — full email/password flow via `@supabase/ssr` (`src/lib/supabase.ts`), session-aware middleware with route protection (`src/middleware.ts`). Both new slices consume this as-is; every saved row must be scoped to the owning user via RLS.
-- **Deploy / infra:** present — Cloudflare Workers via `wrangler`, GitHub Actions CI with auto-deploy on merge, already configured and deployed to production per `context/foundation/infrastructure.md`.
-- **Observability:** absent — unchanged since M-1; not needed by either slice in this milestone.
+- **Frontend:** present (for this milestone's needs) — `src/components/fit-check/GoodsFitForm.tsx` already has per-row inputs (length/width/height/quantity/rotatable/stackable) and a vehicle-dimensions section; `src/components/fit-check/FitCheckResult.tsx` already renders the fit/no-fit banner, packing order, and volume-utilization line. Neither has any weight field or weight-utilization line yet — this milestone adds them to existing sections, not new ones.
+- **Backend / API:** present (for this milestone's needs) — `src/pages/api/fit-check.ts` and `src/lib/validation/fit-check-schema.ts` already establish the JSON API + zod pattern this milestone extends; `goodsItemSchema`/`vehicleDimensionsSchema` have zero weight fields today.
+- **Data:** not applicable — the fit-check computation itself is stateless (request in, result out, nothing persisted); this was true before M-1 and remains true here. (Contrast with M-2's saved profiles/templates, which do persist — see the Parked note below on whether those should also gain weight.)
+- **Business logic:** absent — confirmed by direct read of `src/lib/services/packing/packer.ts` and `src/lib/services/packing/support.ts`: the packing algorithm's placement/support logic is purely geometric today; `isFullySupported` checks only footprint overlap, with zero awareness of mass. This is the actual surface this milestone's slice touches.
+- **Auth:** present — unchanged since M-1/M-2; this milestone doesn't touch persistence or access control at all.
+- **Deploy / infra:** present — unchanged since M-1/M-2.
+- **Observability:** absent — unchanged; not needed by this milestone's slice.
 
 ## Foundations
 
-No Foundations for this milestone. Data is the only absent layer either slice needs, but each slice's persistence need is small and self-contained (one table each, no shared schema or shared migration) — building a generic "data layer" foundation ahead of either slice would complete more of the layer than either slice actually requires. Each slice creates its own table and RLS policy as part of its own plan, following the per-operation, per-role RLS convention CLAUDE.md already documents.
+No Foundations for this milestone. Every FR this milestone covers (FR-001 amendment, FR-002 amendment, FR-009, FR-010, FR-011) is business logic and type/schema surface inside the already-shipped, stateless fit-check feature — there is no new cross-cutting layer to unlock. Adding a foundation ahead of S-01 would mean pre-building part of the one slice that needs it, which the roadmap's own scope-cap rule for Foundations rules out.
 
 ## Slices
 
-### S-01: User saves a vehicle profile and reuses it in a later fit check
+### S-01: Fit check accounts for weight
 
-- **Outcome:** user can save a vehicle's cargo dimensions as a named profile from the fit-check page, and select that saved profile — alongside the existing hardcoded presets and manual entry — on a later visit to prefill the vehicle fields.
-- **Change ID:** `save-vehicle-profile`
-- **PRD refs:** FR-008
-- **Prerequisites:** — (Auth is present and this slice consumes it; the fit-check page it extends is already done; the slice creates its own minimal schema, so Data's absence isn't a blocking prerequisite)
-- **Parallel with:** S-02 (no shared dependency — the PRD's own Socrates note on FR-008 explicitly frames it as independent of FR-007's slice)
+- **Outcome:** user can enter each goods item's weight and the vehicle's maximum payload alongside the existing dimension fields, submit once, and see: a fit determination where exceeding the vehicle's maximum payload always means "doesn't fit" (even if it fits by volume), a packing order that never places a heavier item above a lighter one, and a weight-utilization percentage shown next to the existing volume-utilization percentage.
+- **Change ID:** `weight-aware-fit-check`
+- **PRD refs:** FR-001, FR-002, FR-009, FR-010, FR-011, US-01
+- **Prerequisites:** — (builds entirely on the already-shipped, stateless M-1 fit-check feature; no auth or persistence changes needed)
+- **Parallel with:** — (only slice in this milestone)
 - **Blockers:** —
-- **Unknowns:** —
-- **Risk:** This is the app's first persistence-backed feature — even though the schema itself is small (one table: id, user, label, dimensions), this slice sets the RLS/migration pattern every later persistence feature will follow, so getting the per-user access-control policy right here matters more than the feature's small surface suggests.
-- **Status:** done
-
-### S-02: User saves a goods item as a reusable template and reuses it in a later fit check
-
-- **Outcome:** user can save a single goods item — label, dimensions, whether it can be rotated, whether other items can be stacked on it — as a reusable template from the fit-check page, and load a previously saved item template into the form on a later visit instead of re-entering its fields, mirroring S-01's vehicle-profile pattern applied to one goods item at a time.
-- **Change ID:** `save-goods-item`
-- **PRD refs:** FR-007
-- **Prerequisites:** — (same reasoning as S-01: Auth present, fit-check page already done, this slice owns its own schema)
-- **Parallel with:** S-01
-- **Blockers:** —
-- **Unknowns:** —
-- **Risk:** Low, now that scope is corrected to mirror S-01 directly (one flat row per saved item, same shape of table/RLS/API/UI). Original plan built a list-shaped (`items jsonb`) version against a misread of FR-007; that implementation was discarded (branch reset, orphaned table dropped) before any UI shipped, so no migration/rollback debt carries forward. Re-planned via `/10x-plan`: template excludes `quantity`, "Load" appends a new row.
-- **Status:** done
+- **Unknowns:**
+  - Should the already-shipped saved goods-item templates (FR-007) and vehicle profiles (FR-008) also gain a weight field in this milestone, so loading a saved item/profile doesn't leave weight blank and require re-entry every time? — Owner: user. Block: no (S-01 is fully shippable and verifiable without deciding this — weight can simply be typed fresh on every submission, same as any other field before a template/profile covers it; this is a scope-widening option, not a dependency).
+- **Risk:** Extends the core packing heuristic's placement/support logic (not just a post-hoc pass/fail gate) to also weigh mass when deciding what can stack on what — a larger algorithmic surface than a simple weight-cap check alone, but already scoped and accepted via the PRD's own Socrates resolution on FR-010 ("the user explicitly wants weight to affect packing order, not just a pass/fail gate; the increased algorithmic scope is deliberate, not incidental").
+- **Status:** ready
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID              | Suggested issue title                                          | Ready for `/10x-plan` | Notes |
-| ---------- | ----------------------- | ------------------------------------------------------------- | ---------------------- | ----- |
-| S-01       | `save-vehicle-profile`  | Save & reuse vehicle profile on the fit-check page             | yes                    | Run `/10x-plan save-vehicle-profile` |
-| S-02       | `save-goods-item`       | Save & reuse a goods item template on the fit-check page        | yes                    | Run `/10x-plan save-goods-item` |
+| Roadmap ID | Change ID                | Suggested issue title                                  | Ready for `/10x-plan` | Notes |
+| ---------- | ------------------------- | ------------------------------------------------------- | ---------------------- | ----- |
+| S-01       | `weight-aware-fit-check`  | Make the fit check weight-aware (max payload + stacking) | yes                    | Run `/10x-plan weight-aware-fit-check` |
 
 Each Change ID above is implemented on its own branch of the same name, created when `/10x-implement` starts and merged back to `master` locally once the change is complete — see CLAUDE.md's "Git workflow for changes".
 
 ## Open Roadmap Questions
 
-_None._ The PRD's own `## Open Questions` section reported none, and this milestone's interview surfaced no cross-cutting sequencing questions.
+_None._ The PRD's own `## Open Questions` section reported none. The one real open decision this milestone surfaced (whether saved templates/profiles should also carry weight) is scoped to S-01 alone, not cross-cutting, so it lives in that slice's Unknowns instead of here.
 
 ## Parked
 
 - **Exact trip/vehicle count when goods don't fit (FR-006).** Why parked: nice-to-have; PRD's own Socrates resolution already demoted it below the must-have baseline (bare "doesn't fit," covered by FR-003, done in M-1). Not requested for this milestone — candidate for a future one.
 - **No 2D/3D visual load rendering.** Why parked: PRD Non-Goal — cut during MVP scoping after a timeline-cost check; explicit v2 candidate.
-- **Weight-aware fit checking (FR-009, FR-010, FR-011 in `prd-v2.md`).** Why parked: no longer a PRD Non-Goal as of v2 — promoted to must-have — but not folded into M-2 because it's a distinct outcome (extends the core fit-check from M-1: a hard weight-capacity cap on feasibility, a heavier-below-lighter packing-order rule, and a weight-utilization percentage) unrelated to save/reuse, M-2's actual theme. User-confirmed sequencing (2026-09-11): open as its own milestone (M-3) immediately after M-2 closes.
 - **No multi-vehicle fleet assignment or managing multiple simultaneous loads.** Why parked: PRD Non-Goal — the locked persona plans one vehicle, one load, one trip at a time.
-- **Apply the same in-dropdown delete UX to the saved vehicle-profile select (S-01).** Why parked: user feedback during S-02 (`save-goods-item`) Phase 3 manual testing (2026-09-11) asked for saved goods-item templates to be deletable via a small icon button inside their dropdown option, instead of a separate management list — S-01's vehicle-profile select still uses the older separate-list pattern. Not implemented as part of S-02 (out of scope, S-01 is already shipped/archived); candidate for a small follow-up change for UI consistency across both saved-entity types. See `context/archive/2026-09-11-save-goods-item/change.md` Notes.
+- **Apply the same in-dropdown delete UX to the saved vehicle-profile select (S-01 of M-2).** Why parked: user feedback during M-2's `save-goods-item` Phase 3 manual testing (2026-09-11) asked for saved goods-item templates to be deletable via a small icon button inside their dropdown option, instead of a separate management list — the vehicle-profile select still uses the older separate-list pattern. Candidate for a small follow-up change for UI consistency across both saved-entity types. See `context/archive/2026-09-11-save-goods-item/change.md` Notes.
+- **Adding a weight field to saved goods-item templates (FR-007) and vehicle profiles (FR-008).** Why parked: not declared by any PRD FR — FR-007/FR-008 as written only cover label, dimensions, rotatable, stackable (goods items) and label, dimensions (vehicles). Surfaced as an Unknown on S-01 instead of invented as new scope; revisit once S-01 ships and it's clear whether re-typing weight every time a saved item/profile is used is actually a real friction point worth a follow-up change.
 
 ## Milestone History
 
 - **M-1: First fit-check** (`first-fit-check`) — closed 2026-09-10. Proved the core hypothesis: a user can submit a goods list and a vehicle's cargo dimensions and receive a correct fit/no-fit determination, a packing order, and a volume-utilization percentage (S-01, `single-trip-fit-check`).
+- **M-2: Save and reuse** (`save-and-reuse`) — closed 2026-09-11. A logged-in user can save a vehicle profile and a goods item template from the fit-check page, and run a full fit check by loading both from saved data instead of retyping them (S-01 `save-vehicle-profile`, S-02 `save-goods-item`).
 
 ## Done
 
