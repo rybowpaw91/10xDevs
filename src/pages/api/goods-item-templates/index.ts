@@ -11,6 +11,7 @@ interface GoodsItemTemplateRow {
   length: number;
   width: number;
   height: number;
+  weight: number | null;
   rotatable: boolean;
   stackable: boolean;
 }
@@ -34,7 +35,7 @@ export const GET: APIRoute = async (context) => {
 
   const { data, error } = await supabase
     .from("goods_item_templates")
-    .select("id, label, length, width, height, rotatable, stackable")
+    .select("id, label, length, width, height, weight, rotatable, stackable")
     .order("created_at", { ascending: false })
     .overrideTypes<GoodsItemTemplateRow[], { merge: false }>();
 
@@ -70,7 +71,7 @@ export const POST: APIRoute = async (context) => {
   const { data, error } = await supabase
     .from("goods_item_templates")
     .insert({ ...parsed.data, user_id: context.locals.user.id })
-    .select("id, label, length, width, height, rotatable, stackable")
+    .select("id, label, length, width, height, weight, rotatable, stackable")
     .single()
     .overrideTypes<GoodsItemTemplateRow, { merge: false }>();
 

@@ -69,6 +69,7 @@ export interface GoodsItemTemplate {
   length: number;
   width: number;
   height: number;
+  weight: number | null;
   rotatable: boolean;
   stackable: boolean;
 }

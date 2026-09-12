@@ -269,19 +269,19 @@ Additive only — a new RLS policy and a new nullable column on an existing tabl
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 Type checking passes
-- [ ] 2.3 `npm run build` succeeds with the new handler present
-- [ ] 2.4 `npm run test` passes, including the new schema test cases
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 Type checking passes
+- [x] 2.3 `npm run build` succeeds with the new handler present
+- [x] 2.4 `npm run test` passes, including the new schema test cases
 
 #### Manual
 
-- [ ] 2.5 Authenticated PATCH updates a template (200 + updated row, including weight); subsequent GET reflects the change
-- [ ] 2.6 Invalid PATCH body (missing/non-positive weight, missing label) returns 400 with a clear message
-- [ ] 2.7 PATCH on a nonexistent/non-UUID id returns 404/400
-- [ ] 2.8 Unauthenticated PATCH is redirected/rejected
-- [ ] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
-- [ ] 2.10 POST without weight returns 400; GET on a pre-migration template returns weight: null
+- [x] 2.5 Authenticated PATCH updates a template (200 + updated row, including weight); subsequent GET reflects the change
+- [x] 2.6 Invalid PATCH body (missing/non-positive weight, missing label) returns 400 with a clear message
+- [x] 2.7 PATCH on a nonexistent/non-UUID id returns 404/400
+- [x] 2.8 Unauthenticated PATCH is redirected/rejected
+- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
+- [x] 2.10 POST without weight returns 400; GET on a pre-migration template returns weight: null
 
 ### Phase 3: UI Integration (Dropdown Edit/Delete + weight)
 

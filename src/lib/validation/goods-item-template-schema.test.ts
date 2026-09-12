@@ -8,6 +8,7 @@ describe("goodsItemTemplateInputSchema", () => {
       length: 120,
       width: 80,
       height: 60,
+      weight: 25,
       rotatable: true,
       stackable: false,
     });
@@ -19,6 +20,7 @@ describe("goodsItemTemplateInputSchema", () => {
       length: 120,
       width: 80,
       height: 60,
+      weight: 25,
       rotatable: true,
       stackable: false,
     });
@@ -31,6 +33,7 @@ describe("goodsItemTemplateInputSchema", () => {
       length: 120,
       width: 80,
       height: 60,
+      weight: 25,
       rotatable: true,
       stackable: false,
     });
@@ -43,6 +46,7 @@ describe("goodsItemTemplateInputSchema", () => {
       length: 0,
       width: 80,
       height: 60,
+      weight: 25,
       rotatable: true,
       stackable: false,
     });
@@ -55,6 +59,7 @@ describe("goodsItemTemplateInputSchema", () => {
       length: 120,
       width: -80,
       height: 60,
+      weight: 25,
       rotatable: true,
       stackable: false,
     });
@@ -67,7 +72,33 @@ describe("goodsItemTemplateInputSchema", () => {
       length: 120,
       width: 80,
       height: 60,
+      weight: 25,
       rotatable: "yes",
+      stackable: false,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a missing weight", () => {
+    const result = goodsItemTemplateInputSchema.safeParse({
+      label: "Pallet box",
+      length: 120,
+      width: 80,
+      height: 60,
+      rotatable: true,
+      stackable: false,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a non-positive weight", () => {
+    const result = goodsItemTemplateInputSchema.safeParse({
+      label: "Pallet box",
+      length: 120,
+      width: 80,
+      height: 60,
+      weight: 0,
+      rotatable: true,
       stackable: false,
     });
     expect(result.success).toBe(false);
