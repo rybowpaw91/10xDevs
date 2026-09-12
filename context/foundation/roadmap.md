@@ -3,7 +3,7 @@ project: LoadFit
 version: 1
 status: draft
 created: 2026-09-09
-updated: 2026-09-12
+updated: 2026-09-13
 prd_version: 3
 main_goal: low-complexity
 top_blocker: capacity
@@ -43,7 +43,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID                   | Outcome (user can …)                                                                 | Prerequisites | PRD refs | Status |
 | ---- | ---------------------------- | -------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
-| S-01 | `edit-vehicle-profile`       | Edit a saved vehicle profile's label and dimensions in place                           | —              | MS-01    | in-progress |
+| S-01 | `edit-vehicle-profile`       | Edit a saved vehicle profile's label and dimensions in place                           | —              | MS-01    | done |
 | S-02 | `edit-goods-item-template`   | Edit a saved goods-item template's label, dimensions, rotatable, and stackable in place | —              | MS-02    | ready  |
 
 ## Baseline
@@ -74,7 +74,7 @@ No Foundations for this milestone. Adding an `UPDATE` RLS policy + a `PATCH`/`PU
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This table has never had an `UPDATE` RLS policy before — getting its per-user access-control policy right (scoped `to authenticated`, `auth.uid() = user_id` on both `using` and `with check`) matters more than the feature's small surface suggests, same category of risk M-2's S-01 flagged for its original `INSERT`/`DELETE` policies.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-02: User edits a saved goods-item template
 
@@ -121,3 +121,4 @@ _None._ This milestone is self-described (no PRD to cross-check); no cross-cutti
 - **S-01: user can save a vehicle's cargo dimensions as a named profile from the fit-check page, and select that saved profile — alongside the existing hardcoded presets and manual entry — on a later visit to prefill the vehicle fields.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-vehicle-profile/`. Lesson: —.
 - **S-02: user can save a single goods item — label, dimensions, whether it can be rotated, whether other items can be stacked on it — as a reusable template from the fit-check page, and load a previously saved item template into the form on a later visit instead of re-entering its fields, mirroring S-01's vehicle-profile pattern applied to one goods item at a time.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-goods-item/`. Lesson: —.
 - **S-01: user can enter each goods item's weight and the vehicle's maximum payload alongside the existing dimension fields, submit once, and see: a fit determination where exceeding the vehicle's maximum payload always means "doesn't fit" (even if it fits by volume), a packing order that never places a heavier item above a lighter one, and a weight-utilization percentage shown next to the existing volume-utilization percentage.** — Archived 2026-09-12 → `context/archive/2026-09-12-weight-aware-fit-check/`. Lesson: —.
+- **S-01: user can edit a previously saved vehicle profile's label and dimensions in place, instead of deleting and re-saving it.** — Archived 2026-09-13 → `context/archive/2026-09-12-edit-vehicle-profile/`. Lesson: —.
