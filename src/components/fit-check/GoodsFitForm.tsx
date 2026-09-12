@@ -22,6 +22,7 @@ import { vehicleProfileInputSchema } from "@/lib/validation/vehicle-profile-sche
 import type {
   FitCheckRequest,
   FitCheckResult,
+  GoodsItemInput,
   GoodsItemTemplate,
   VehicleDimensionsInput,
   VehicleProfile,
@@ -34,6 +35,7 @@ interface GoodsRowState {
   length: string;
   width: string;
   height: string;
+  weight: string;
   quantity: string;
   rotatable: boolean;
   stackable: boolean;
@@ -44,6 +46,7 @@ interface VehicleState {
   length: string;
   width: string;
   height: string;
+  maxPayload: string;
 }
 
 interface ErrorTree {
@@ -59,6 +62,7 @@ function createRow(id: number): GoodsRowState {
     length: "",
     width: "",
     height: "",
+    weight: "",
     quantity: "1",
     rotatable: true,
     stackable: true,
@@ -77,7 +81,7 @@ function collectZodErrors(tree: ErrorTree | undefined): string[] {
   return messages;
 }
 
-function buildRequest(rows: GoodsRowState[], vehicle: VehicleState): FitCheckRequest {
+function buildRequest(rows: GoodsRowState[], vehicle: VehicleState, preserveOrder: boolean): FitCheckRequest {
   const usedLabels = new Set<string>();
   const items = rows.map((row) => {
     const baseLabel = row.label.trim() || "Item";
@@ -94,6 +98,7 @@ function buildRequest(rows: GoodsRowState[], vehicle: VehicleState): FitCheckReq
       length: Number(row.length),
       width: Number(row.width),
       height: Number(row.height),
+      weight: Number(row.weight),
       quantity: Number(row.quantity),
       rotatable: row.rotatable,
       stackable: row.stackable,
@@ -106,19 +111,29 @@ function buildRequest(rows: GoodsRowState[], vehicle: VehicleState): FitCheckReq
       length: Number(vehicle.length),
       width: Number(vehicle.width),
       height: Number(vehicle.height),
+      maxPayload: Number(vehicle.maxPayload),
     },
+    preserveOrder,
   };
 }
 
 export default function GoodsFitForm() {
   const nextRowId = useRef(1);
   const [rows, setRows] = useState<GoodsRowState[]>(() => [createRow(0)]);
-  const [vehicle, setVehicle] = useState<VehicleState>({ presetId: "custom", length: "", width: "", height: "" });
+  const [vehicle, setVehicle] = useState<VehicleState>({
+    presetId: "custom",
+    length: "",
+    width: "",
+    height: "",
+    maxPayload: "",
+  });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<FitCheckResult | null>(null);
   const [resultVehicle, setResultVehicle] = useState<VehicleDimensionsInput | null>(null);
+  const [resultItems, setResultItems] = useState<GoodsItemInput[]>([]);
+  const [preserveOrder, setPreserveOrder] = useState(false);
 
   const [savedProfiles, setSavedProfiles] = useState<VehicleProfile[]>([]);
   const [profileLabel, setProfileLabel] = useState("");
@@ -193,6 +208,9 @@ export default function GoodsFitForm() {
       length: source ? String(source.length) : prev.length,
       width: source ? String(source.width) : prev.width,
       height: source ? String(source.height) : prev.height,
+      // Saved vehicle profiles don't carry a max payload (deferred scope) — only a hardcoded
+      // preset can prefill it; selecting a profile leaves whatever payload is already entered.
+      maxPayload: preset ? String(preset.maxPayload) : prev.maxPayload,
     }));
   }
 
@@ -295,6 +313,7 @@ export default function GoodsFitForm() {
         length: String(template.length),
         width: String(template.width),
         height: String(template.height),
+        weight: "",
         quantity: "1",
         rotatable: template.rotatable,
         stackable: template.stackable,
@@ -325,7 +344,7 @@ export default function GoodsFitForm() {
     setApiError(null);
     setResult(null);
 
-    const request = buildRequest(rows, vehicle);
+    const request = buildRequest(rows, vehicle, preserveOrder);
     const parsed = fitCheckRequestSchema.safeParse(request);
     if (!parsed.success) {
       setValidationErrors(collectZodErrors(z.treeifyError(parsed.error)));
@@ -355,6 +374,7 @@ export default function GoodsFitForm() {
       const data = (await response.json()) as FitCheckResult;
       setResult(data);
       setResultVehicle(parsed.data.vehicle);
+      setResultItems(parsed.data.items);
     } catch {
       setApiError("Could not reach the server. Please try again.");
     } finally {
@@ -429,6 +449,18 @@ export default function GoodsFitForm() {
                 value={vehicle.height}
                 onChange={(e) => {
                   setVehicle((prev) => ({ ...prev, height: e.target.value }));
+                }}
+                className="bg-white/10 text-white"
+              />
+            </div>
+            <div>
+              <Label className="mb-1 text-blue-100/80">Max payload (kg)</Label>
+              <Input
+                type="number"
+                min="0"
+                value={vehicle.maxPayload}
+                onChange={(e) => {
+                  setVehicle((prev) => ({ ...prev, maxPayload: e.target.value }));
                 }}
                 className="bg-white/10 text-white"
               />
@@ -549,10 +581,21 @@ export default function GoodsFitForm() {
 
           {itemTemplateError && <p className="mb-3 text-sm text-red-300">{itemTemplateError}</p>}
 
+          <label className="mb-3 flex items-center gap-2 text-sm text-blue-100/80">
+            <Checkbox
+              checked={preserveOrder}
+              onCheckedChange={(checked) => {
+                setPreserveOrder(checked === true);
+              }}
+            />
+            Preserve the exact order shown below when packing (otherwise heavier items may be placed earlier so lighter
+            items can rest on top of them)
+          </label>
+
           <div className="space-y-3">
             {rows.map((row) => (
               <div key={row.key} className="rounded-lg border border-white/10 bg-white/5 p-4">
-                <div className="grid gap-3 sm:grid-cols-6">
+                <div className="grid gap-3 sm:grid-cols-7">
                   <div className="sm:col-span-2">
                     <Label className="mb-1 text-blue-100/80">Label</Label>
                     <Input
@@ -595,6 +638,18 @@ export default function GoodsFitForm() {
                       value={row.height}
                       onChange={(e) => {
                         updateRow(row.key, { height: e.target.value });
+                      }}
+                      className="bg-white/10 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-1 text-blue-100/80">Weight (kg)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={row.weight}
+                      onChange={(e) => {
+                        updateRow(row.key, { weight: e.target.value });
                       }}
                       className="bg-white/10 text-white"
                     />
@@ -690,7 +745,7 @@ export default function GoodsFitForm() {
         </Button>
       </form>
 
-      {result && resultVehicle && <FitCheckResultView result={result} vehicle={resultVehicle} />}
+      {result && resultVehicle && <FitCheckResultView result={result} vehicle={resultVehicle} items={resultItems} />}
     </div>
   );
 }

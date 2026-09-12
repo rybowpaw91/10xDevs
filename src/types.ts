@@ -19,6 +19,7 @@ export interface VehicleDimensionsInput {
 export interface FitCheckRequest {
   items: GoodsItemInput[];
   vehicle: VehicleDimensionsInput;
+  preserveOrder: boolean;
 }
 
 export interface PlacedUnit {

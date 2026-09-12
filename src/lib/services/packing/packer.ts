@@ -18,7 +18,6 @@ interface ExpandedUnit {
   rotatable: boolean;
   stackable: boolean;
   weight: number;
-  volume: number;
 }
 
 interface PlacedUnitInternal extends PlacedBox {
@@ -61,10 +60,9 @@ function findOversizedItemIds(items: GoodsItemInput[], vehicle: VehicleDimension
   return oversized;
 }
 
-function expandUnits(items: GoodsItemInput[]): ExpandedUnit[] {
+function expandUnits(items: GoodsItemInput[], preserveOrder: boolean): ExpandedUnit[] {
   const units: ExpandedUnit[] = [];
   for (const item of items) {
-    const volume = item.length * item.width * item.height;
     for (let unitIndex = 0; unitIndex < item.quantity; unitIndex++) {
       units.push({
         itemId: item.id,
@@ -73,11 +71,13 @@ function expandUnits(items: GoodsItemInput[]): ExpandedUnit[] {
         rotatable: item.rotatable,
         stackable: item.stackable,
         weight: item.weight,
-        volume,
       });
     }
   }
-  return units.sort((a, b) => b.volume - a.volume);
+  // preserveOrder: keep the exact order items were entered (the push order above already is that
+  // order). Otherwise the algorithm has freedom to choose placement order, and orders heaviest-first
+  // so lighter items can be placed on top of heavier ones rather than the other way around.
+  return preserveOrder ? units : units.sort((a, b) => b.weight - a.weight);
 }
 
 function compareExtremePoints(a: ExtremePoint, b: ExtremePoint): number {
@@ -180,7 +180,7 @@ function tryPlace(
 }
 
 export function runFitCheck(request: FitCheckRequest): FitCheckResult {
-  const { items, vehicle } = request;
+  const { items, vehicle, preserveOrder } = request;
 
   if (items.length === 0) {
     return {
@@ -195,7 +195,9 @@ export function runFitCheck(request: FitCheckRequest): FitCheckResult {
 
   const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0);
   if (totalWeight > vehicle.maxPayload + EPSILON) {
-    return emptyNoFitResult("Total goods weight exceeds the vehicle's maximum payload.");
+    return emptyNoFitResult(
+      `Total goods weight (${totalWeight} kg) exceeds the vehicle's maximum payload (${vehicle.maxPayload} kg).`,
+    );
   }
 
   const oversizedItemIds = findOversizedItemIds(items, vehicle);
@@ -206,7 +208,7 @@ export function runFitCheck(request: FitCheckRequest): FitCheckResult {
     );
   }
 
-  const units = expandUnits(items);
+  const units = expandUnits(items, preserveOrder);
   const placed: PlacedUnitInternal[] = [];
   const extremePoints: ExtremePoint[] = [{ x: 0, y: 0, z: 0 }];
   const packingOrder: string[] = [];
@@ -222,7 +224,7 @@ export function runFitCheck(request: FitCheckRequest): FitCheckResult {
         tryPlace(unit, orientations, candidates, placed, vehicle, Number.NEGATIVE_INFINITY) !== null;
       return emptyNoFitResult(
         wouldFitIgnoringWeight
-          ? "The packing order couldn't satisfy the weight-based stacking rule: a heavier item would need to rest on a lighter one."
+          ? `Item "${unit.itemId}" (${unit.weight} kg) has no sufficiently heavy item to rest on: the weight-based stacking rule blocks every otherwise-valid spot.`
           : "The goods list doesn't fit within the vehicle's cargo volume in a single trip.",
       );
     }

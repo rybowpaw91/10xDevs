@@ -23,6 +23,7 @@ export const fitCheckRequestSchema = z
   .object({
     items: z.array(goodsItemSchema).min(1),
     vehicle: vehicleDimensionsSchema.extend({ maxPayload: z.number().positive() }),
+    preserveOrder: z.boolean(),
   })
   .refine((data) => data.items.reduce((sum, item) => sum + item.quantity, 0) <= TOTAL_UNIT_CAP, {
     message: `Total quantity across all items must not exceed ${TOTAL_UNIT_CAP} units.`,

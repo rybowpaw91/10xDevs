@@ -1,4 +1,4 @@
-import type { FitCheckResult, LayerGrid, VehicleDimensionsInput } from "@/types";
+import type { FitCheckResult, GoodsItemInput, LayerGrid, VehicleDimensionsInput } from "@/types";
 
 const GRID_PIXEL_WIDTH = 320;
 const PALETTE = ["#60a5fa", "#f472b6", "#34d399", "#fbbf24", "#a78bfa", "#fb7185"];
@@ -18,9 +18,10 @@ function buildItemColorMap(layers: LayerGrid[]): Map<string, string> {
 interface FitCheckResultViewProps {
   result: FitCheckResult;
   vehicle: VehicleDimensionsInput;
+  items: GoodsItemInput[];
 }
 
-export function FitCheckResultView({ result, vehicle }: FitCheckResultViewProps) {
+export function FitCheckResultView({ result, vehicle, items }: FitCheckResultViewProps) {
   if (!result.fits) {
     return (
       <div className="rounded-lg border border-red-400/40 bg-red-500/10 p-4 text-red-100">
@@ -28,9 +29,16 @@ export function FitCheckResultView({ result, vehicle }: FitCheckResultViewProps)
         <p className="mt-1 text-sm text-red-100/80">{result.reason}</p>
         {result.oversizedItemIds && result.oversizedItemIds.length > 0 && (
           <ul className="mt-2 list-inside list-disc text-sm text-red-100/80">
-            {result.oversizedItemIds.map((id) => (
-              <li key={id}>{id}</li>
-            ))}
+            {result.oversizedItemIds.map((id) => {
+              const item = items.find((candidate) => candidate.id === id);
+              return (
+                <li key={id}>
+                  {id}
+                  {item &&
+                    ` (${item.length}x${item.width}x${item.height} cm) vs. vehicle cargo space (${vehicle.length}x${vehicle.width}x${vehicle.height} cm)`}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
@@ -48,6 +56,7 @@ export function FitCheckResultView({ result, vehicle }: FitCheckResultViewProps)
         <p className="mt-1 text-sm text-emerald-100/80">
           Volume utilization (volume-only): {result.utilizationPercent}%
         </p>
+        <p className="text-sm text-emerald-100/80">Weight utilization: {result.weightUtilizationPercent}%</p>
       </div>
 
       <div>

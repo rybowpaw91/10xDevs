@@ -29,6 +29,7 @@ const requestArb: fc.Arbitrary<FitCheckRequest> = fc
       height: fc.integer({ min: 20, max: 120 }),
       maxPayload: fc.integer({ min: 10, max: 500 }),
     }),
+    preserveOrder: fc.boolean(),
   })
   .map((request) => ({
     ...request,

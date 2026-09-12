@@ -29,6 +29,7 @@ describe("runFitCheck", () => {
           stackable: true,
         },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(true);
@@ -42,6 +43,7 @@ describe("runFitCheck", () => {
       items: [
         { id: "box", length: 60, width: 60, height: 60, weight: 1, quantity: 5, rotatable: false, stackable: true },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(false);
@@ -62,6 +64,7 @@ describe("runFitCheck", () => {
           stackable: false,
         },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(false);
@@ -84,6 +87,7 @@ describe("runFitCheck", () => {
         },
         { id: "top", length: 100, width: 100, height: 50, weight: 1, quantity: 1, rotatable: false, stackable: true },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(true);
@@ -97,6 +101,7 @@ describe("runFitCheck", () => {
       items: [
         { id: "plank", length: 80, width: 20, height: 10, weight: 1, quantity: 1, rotatable: false, stackable: false },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(true);
@@ -109,6 +114,7 @@ describe("runFitCheck", () => {
       items: [
         { id: "widget", length: 40, width: 30, height: 20, weight: 1, quantity: 3, rotatable: true, stackable: true },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(true);
@@ -116,16 +122,19 @@ describe("runFitCheck", () => {
     assertNoOverlap(result.placements);
   });
 
-  it("reports no-fit when total weight exceeds the vehicle's maximum payload, even though it fits by volume", () => {
+  it("reports no-fit with the actual numbers when total weight exceeds the vehicle's maximum payload, even though it fits by volume", () => {
     const request: FitCheckRequest = {
       vehicle: { length: 100, width: 100, height: 100, maxPayload: 50 },
       items: [
         { id: "heavy", length: 10, width: 10, height: 10, weight: 100, quantity: 1, rotatable: false, stackable: true },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(false);
     expect(result.reason).toMatch(/maximum payload/i);
+    expect(result.reason).toContain("100");
+    expect(result.reason).toContain("50");
   });
 
   it("computes weight utilization percent on a successful fit", () => {
@@ -134,26 +143,20 @@ describe("runFitCheck", () => {
       items: [
         { id: "crate", length: 50, width: 50, height: 50, weight: 20, quantity: 1, rotatable: false, stackable: true },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(true);
     expect(result.weightUtilizationPercent).toBe(50);
   });
 
-  it("places a heavier unit (processed first for having greater volume) below a lighter one stacked on it", () => {
+  it("free order: reorders a heavier item (entered after a lighter one) to be placed first, so it ends up below the lighter one", () => {
+    // "light" is entered FIRST in the items array, "heavy" second — a naive "process in input order"
+    // implementation would place light at the bottom and be unable to stack heavy on it. With
+    // preserveOrder: false the algorithm has freedom to reorder, and must place heavy first instead.
     const request: FitCheckRequest = {
       vehicle: { length: 100, width: 100, height: 30, maxPayload: 120 },
       items: [
-        {
-          id: "heavy",
-          length: 100,
-          width: 100,
-          height: 20,
-          weight: 50,
-          quantity: 1,
-          rotatable: false,
-          stackable: true,
-        },
         {
           id: "light",
           length: 100,
@@ -164,7 +167,18 @@ describe("runFitCheck", () => {
           rotatable: false,
           stackable: true,
         },
+        {
+          id: "heavy",
+          length: 100,
+          width: 100,
+          height: 20,
+          weight: 50,
+          quantity: 1,
+          rotatable: false,
+          stackable: true,
+        },
       ],
+      preserveOrder: false,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(true);
@@ -175,11 +189,10 @@ describe("runFitCheck", () => {
     expect(heavy?.position.z).toBeLessThan(light?.position.z ?? Infinity);
   });
 
-  it("reports no-fit (weight-stacking reason, not the generic volume reason) when the only geometric spot for a heavier unit is above a lighter one", () => {
-    // "light" has the larger volume, so it's processed and placed first (occupying the vehicle's
-    // entire footprint at ground level); "heavy" is smaller by volume but heavier, and the vehicle's
-    // dimensions leave no room for it except directly on top of "light" — which the weight-based
-    // stacking rule must refuse, even though the spot is otherwise geometrically valid.
+  it("preserve order: reports no-fit (weight-stacking reason) rather than reordering, when entry order would need a heavier item to rest on a lighter one", () => {
+    // Same items and vehicle as the free-order test above, but preserveOrder: true forces the
+    // algorithm to respect the entered order (light first) even though reordering could have
+    // produced a valid packing — it must refuse rather than silently reorder.
     const request: FitCheckRequest = {
       vehicle: { length: 100, width: 100, height: 30, maxPayload: 1000 },
       items: [
@@ -204,9 +217,46 @@ describe("runFitCheck", () => {
           stackable: true,
         },
       ],
+      preserveOrder: true,
     };
     const result = runFitCheck(request);
     expect(result.fits).toBe(false);
     expect(result.reason).toMatch(/weight-based stacking/i);
+    expect(result.reason).toContain("heavy");
+  });
+
+  it("preserve order: succeeds without reordering when the entered order already respects the weight-stacking rule", () => {
+    const request: FitCheckRequest = {
+      vehicle: { length: 100, width: 100, height: 30, maxPayload: 120 },
+      items: [
+        {
+          id: "heavy",
+          length: 100,
+          width: 100,
+          height: 20,
+          weight: 50,
+          quantity: 1,
+          rotatable: false,
+          stackable: true,
+        },
+        {
+          id: "light",
+          length: 100,
+          width: 100,
+          height: 10,
+          weight: 10,
+          quantity: 1,
+          rotatable: false,
+          stackable: true,
+        },
+      ],
+      preserveOrder: true,
+    };
+    const result = runFitCheck(request);
+    expect(result.fits).toBe(true);
+
+    const heavy = result.placements.find((p) => p.itemId === "heavy");
+    const light = result.placements.find((p) => p.itemId === "light");
+    expect(heavy?.position.z).toBeLessThan(light?.position.z ?? Infinity);
   });
 });

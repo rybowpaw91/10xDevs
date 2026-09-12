@@ -169,6 +169,13 @@ Wire weight and max-payload into the existing goods-row and vehicle-section UI, 
 
 **Contract**: On the `fits: true` branch, add a line below the existing "Volume utilization (volume-only): …%" line reading something like "Weight utilization: {result.weightUtilizationPercent}%". No change needed to the `fits: false` branch — the three distinct reasons from Phase 1 already flow through the existing `{result.reason}` text.
 
+#### Addendum (in-session extension, requested during Phase 2 manual testing, documented here after the fact)
+
+Two pieces of feedback surfaced once weight-aware fit checking was visible end-to-end, both implemented as part of Phase 2 rather than deferred:
+
+1. **Failure detail must show the actual numbers, not just descriptive text.** `packer.ts`'s weight-cap and weight-stacking-blocked reason strings now embed the real values directly (e.g. `Total goods weight (100 kg) exceeds the vehicle's maximum payload (50 kg).` and `Item "heavy" (50 kg) has no sufficiently heavy item to rest on: ...`) — single source of truth, no client-side recomputation. The oversized-dimensions case is enriched client-side instead: `FitCheckResultView` now takes an `items: GoodsItemInput[]` prop (the submitted request's items, tracked in a new `resultItems` state in `GoodsFitForm.tsx`) and looks up each oversized item's own dimensions to display alongside the vehicle's cargo dimensions — no backend response-shape change needed for that case.
+2. **Whether entry order matters is a user choice, not a fixed algorithm behavior.** `FitCheckRequest`/`fitCheckRequestSchema` gain a required `preserveOrder: boolean`. In `packer.ts`, `expandUnits` either preserves the exact input order (skips sorting entirely — the push order already is that order) when `preserveOrder` is true, or sorts by weight descending (heaviest unit first, replacing the old volume-descending default) when false, so heavier items get placed first and lighter ones can rest on them. A `Checkbox` in `GoodsFitForm.tsx` ("Preserve the exact order shown below when packing"), unchecked by default, drives this. This is a genuine behavior change from Phase 1's original volume-descending default — Phase 1's own `## Changes Required` text above still describes the shape as originally planned; this addendum is the accurate record of what shipped.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -179,9 +186,11 @@ Wire weight and max-payload into the existing goods-row and vehicle-section UI, 
 
 #### Manual Verification:
 
-- Entering a goods list whose total weight exceeds the vehicle's max payload shows "doesn't fit" with a reason naming the payload limit, even when the same goods would fit by volume alone
+- Entering a goods list whose total weight exceeds the vehicle's max payload shows "doesn't fit" with a reason naming the payload limit **and showing the actual total-weight and max-payload numbers**, even when the same goods would fit by volume alone
+- An oversized-item no-fit shows each oversized item's own dimensions alongside the vehicle's cargo dimensions, not just a bare item name
 - On a successful fit, the weight-utilization percentage is shown alongside the volume-utilization percentage and looks correct for the entered values
-- **Heavier-item-entered-first scenario**: enter a light item first, then a heavier item second (input order that would trip up a naive "first come, first placed" implementation); submit and confirm the heavier item still ends up placed lower (not stacked above the lighter one) in the packing order / layer view
+- **"Preserve entry order" unchecked (default)**: enter a light item first, then a heavier item second; submit and confirm the heavier item still ends up placed lower (not stacked above the lighter one) — the algorithm reorders for you
+- **"Preserve entry order" checked**: same light-then-heavy input; submit and confirm it now reports "doesn't fit" with a reason naming the weight-based stacking rule and the specific item, rather than silently reordering
 - Selecting a vehicle preset prefills its max payload alongside its dimensions
 - Selecting a saved vehicle profile prefills dimensions but leaves whatever max payload was already entered untouched (not cleared)
 - Signed-out visit to the fit-check page still redirects to sign-in (unchanged baseline)
@@ -238,23 +247,25 @@ None — this feature is entirely stateless (no new tables, no schema migration)
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes
-- [x] 1.2 Type checking passes with the new fields in place
-- [x] 1.3 `npm run test` passes, including new unit and property tests
+- [x] 1.1 `npm run lint` passes — 3fdd729
+- [x] 1.2 Type checking passes with the new fields in place — 3fdd729
+- [x] 1.3 `npm run test` passes, including new unit and property tests — 3fdd729
 
 ### Phase 2: UI Integration (Fit-Check Form & Result)
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 Type checking passes
-- [ ] 2.3 `npm run build` succeeds
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 Type checking passes
+- [x] 2.3 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 2.4 Weight-over-payload load reports "doesn't fit" with a payload-specific reason even when it fits by volume
-- [ ] 2.5 Successful fit shows both volume-utilization and weight-utilization percentages, numerically correct
-- [ ] 2.6 Heavier-item-entered-first scenario: heavier item ends up placed lower, never stacked above the lighter one
-- [ ] 2.7 Vehicle preset selection prefills max payload alongside dimensions
-- [ ] 2.8 Saved vehicle profile selection prefills dimensions but leaves max payload untouched
-- [ ] 2.9 Signed-out visit still redirects to sign-in
+- [x] 2.4 Weight-over-payload load reports "doesn't fit" with a payload-specific reason showing the actual numbers, even when it fits by volume
+- [x] 2.5 Oversized-item no-fit shows each item's own dimensions alongside the vehicle's cargo dimensions
+- [x] 2.6 Successful fit shows both volume-utilization and weight-utilization percentages, numerically correct
+- [x] 2.7 "Preserve entry order" unchecked (default): heavier item ends up placed lower via reordering, never stacked above the lighter one
+- [x] 2.8 "Preserve entry order" checked: same input reports doesn't-fit naming the weight-based stacking rule, instead of reordering
+- [x] 2.9 Vehicle preset selection prefills max payload alongside dimensions
+- [x] 2.10 Saved vehicle profile selection prefills dimensions but leaves max payload untouched
+- [x] 2.11 Signed-out visit still redirects to sign-in
