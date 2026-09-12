@@ -224,16 +224,16 @@ export default function GoodsFitForm() {
     const preset = VEHICLE_PRESETS.find((candidate) => candidate.id === presetId);
     const profile = savedProfiles.find((candidate) => candidate.id === presetId);
     const source = preset ?? profile;
-    // A hardcoded preset always has a max payload; a saved profile might not (rows saved before
-    // this field existed have max_payload: null) — in that case leave whatever payload is already
-    // entered rather than clearing it.
+    // A saved profile created before max_payload existed has max_payload: null — in that case
+    // clear the field rather than keeping a previous selection's payload, which would otherwise
+    // silently pair one vehicle's dimensions with a different vehicle's payload capacity.
     const sourceMaxPayload = preset ? preset.maxPayload : profile?.maxPayload;
     setVehicle((prev) => ({
       presetId,
       length: source ? String(source.length) : prev.length,
       width: source ? String(source.width) : prev.width,
       height: source ? String(source.height) : prev.height,
-      maxPayload: sourceMaxPayload != null ? String(sourceMaxPayload) : prev.maxPayload,
+      maxPayload: source ? (sourceMaxPayload != null ? String(sourceMaxPayload) : "") : prev.maxPayload,
     }));
   }
 
@@ -276,15 +276,19 @@ export default function GoodsFitForm() {
   }
 
   async function deleteProfile(id: string) {
+    setProfileError(null);
     try {
       const response = await fetch(`/api/vehicle-profiles/${id}`, { method: "DELETE" });
-      if (!response.ok) return;
+      if (!response.ok) {
+        setProfileError(`Could not delete profile (status ${response.status}).`);
+        return;
+      }
       setSavedProfiles((prev) => prev.filter((profile) => profile.id !== id));
       if (vehicle.presetId === id) {
         setVehicle((prev) => ({ ...prev, presetId: "custom" }));
       }
     } catch {
-      // Best-effort — leave the list as-is if the request fails.
+      setProfileError("Could not reach the server. Please try again.");
     }
   }
 
@@ -420,12 +424,16 @@ export default function GoodsFitForm() {
   }
 
   async function deleteItemTemplate(id: string) {
+    setItemTemplateError(null);
     try {
       const response = await fetch(`/api/goods-item-templates/${id}`, { method: "DELETE" });
-      if (!response.ok) return;
+      if (!response.ok) {
+        setItemTemplateError(`Could not delete item (status ${response.status}).`);
+        return;
+      }
       setSavedItemTemplates((prev) => prev.filter((template) => template.id !== id));
     } catch {
-      // Best-effort — leave the list as-is if the request fails.
+      setItemTemplateError("Could not reach the server. Please try again.");
     }
   }
 
