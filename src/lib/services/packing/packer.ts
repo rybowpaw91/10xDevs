@@ -17,6 +17,7 @@ interface ExpandedUnit {
   dims: Dimensions;
   rotatable: boolean;
   stackable: boolean;
+  weight: number;
   volume: number;
 }
 
@@ -24,6 +25,7 @@ interface PlacedUnitInternal extends PlacedBox {
   itemId: string;
   unitIndex: number;
   stackable: boolean;
+  weight: number;
 }
 
 interface ExtremePoint {
@@ -70,6 +72,7 @@ function expandUnits(items: GoodsItemInput[]): ExpandedUnit[] {
         dims: { length: item.length, width: item.width, height: item.height },
         rotatable: item.rotatable,
         stackable: item.stackable,
+        weight: item.weight,
         volume,
       });
     }
@@ -131,14 +134,68 @@ function emptyNoFitResult(reason: string, oversizedItemIds?: string[]): FitCheck
     placements: [],
     layers: [],
     utilizationPercent: 0,
+    weightUtilizationPercent: 0,
   };
+}
+
+function tryPlace(
+  unit: ExpandedUnit,
+  orientations: Dimensions[],
+  candidates: ExtremePoint[],
+  placed: PlacedUnitInternal[],
+  vehicle: VehicleDimensionsInput,
+  supportWeight: number,
+): PlacedUnitInternal | null {
+  for (const ep of candidates) {
+    for (const orientation of orientations) {
+      if (!fitsWithinVehicle(orientation, ep, vehicle)) continue;
+
+      const candidateBox: PlacedBox = { x: ep.x, y: ep.y, z: ep.z, ...orientation };
+      const overlapsExisting = placed.some((existing) => boxesOverlap(candidateBox, existing));
+      if (overlapsExisting) continue;
+
+      const supported = isFullySupported(
+        {
+          x: ep.x,
+          y: ep.y,
+          z: ep.z,
+          length: orientation.length,
+          width: orientation.width,
+          weight: supportWeight,
+        },
+        placed,
+      );
+      if (!supported) continue;
+
+      return {
+        itemId: unit.itemId,
+        unitIndex: unit.unitIndex,
+        stackable: unit.stackable,
+        weight: unit.weight,
+        ...candidateBox,
+      };
+    }
+  }
+  return null;
 }
 
 export function runFitCheck(request: FitCheckRequest): FitCheckResult {
   const { items, vehicle } = request;
 
   if (items.length === 0) {
-    return { fits: true, packingOrder: [], placements: [], layers: [], utilizationPercent: 0 };
+    return {
+      fits: true,
+      packingOrder: [],
+      placements: [],
+      layers: [],
+      utilizationPercent: 0,
+      weightUtilizationPercent: 0,
+    };
+  }
+
+  const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0);
+  if (totalWeight > vehicle.maxPayload + EPSILON) {
+    return emptyNoFitResult("Total goods weight exceeds the vehicle's maximum payload.");
   }
 
   const oversizedItemIds = findOversizedItemIds(items, vehicle);
@@ -158,35 +215,16 @@ export function runFitCheck(request: FitCheckRequest): FitCheckResult {
     const orientations = getEligibleOrientations(unit.dims, unit.rotatable);
     const candidates = [...extremePoints].sort(compareExtremePoints);
 
-    let placedUnit: PlacedUnitInternal | null = null;
-
-    for (const ep of candidates) {
-      for (const orientation of orientations) {
-        if (!fitsWithinVehicle(orientation, ep, vehicle)) continue;
-
-        const candidateBox: PlacedBox = { x: ep.x, y: ep.y, z: ep.z, ...orientation };
-        const overlapsExisting = placed.some((existing) => boxesOverlap(candidateBox, existing));
-        if (overlapsExisting) continue;
-
-        const supported = isFullySupported(
-          { x: ep.x, y: ep.y, z: ep.z, length: orientation.length, width: orientation.width },
-          placed,
-        );
-        if (!supported) continue;
-
-        placedUnit = {
-          itemId: unit.itemId,
-          unitIndex: unit.unitIndex,
-          stackable: unit.stackable,
-          ...candidateBox,
-        };
-        break;
-      }
-      if (placedUnit) break;
-    }
+    const placedUnit = tryPlace(unit, orientations, candidates, placed, vehicle, unit.weight);
 
     if (!placedUnit) {
-      return emptyNoFitResult("The goods list doesn't fit within the vehicle's cargo volume in a single trip.");
+      const wouldFitIgnoringWeight =
+        tryPlace(unit, orientations, candidates, placed, vehicle, Number.NEGATIVE_INFINITY) !== null;
+      return emptyNoFitResult(
+        wouldFitIgnoringWeight
+          ? "The packing order couldn't satisfy the weight-based stacking rule: a heavier item would need to rest on a lighter one."
+          : "The goods list doesn't fit within the vehicle's cargo volume in a single trip.",
+      );
     }
 
     placed.push(placedUnit);
@@ -202,6 +240,8 @@ export function runFitCheck(request: FitCheckRequest): FitCheckResult {
   const vehicleVolume = vehicle.length * vehicle.width * vehicle.height;
   const usedVolume = placed.reduce((sum, unit) => sum + unit.length * unit.width * unit.height, 0);
   const utilizationPercent = vehicleVolume > 0 ? Math.round((usedVolume / vehicleVolume) * 10000) / 100 : 0;
+  const weightUtilizationPercent =
+    vehicle.maxPayload > 0 ? Math.round((totalWeight / vehicle.maxPayload) * 10000) / 100 : 0;
 
   return {
     fits: true,
@@ -209,5 +249,6 @@ export function runFitCheck(request: FitCheckRequest): FitCheckResult {
     placements: placed.map(toPlacedUnit),
     layers: buildLayers(placed),
     utilizationPercent,
+    weightUtilizationPercent,
   };
 }

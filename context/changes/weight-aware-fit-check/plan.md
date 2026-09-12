@@ -238,9 +238,9 @@ None — this feature is entirely stateless (no new tables, no schema migration)
 
 #### Automated
 
-- [ ] 1.1 `npm run lint` passes
-- [ ] 1.2 Type checking passes with the new fields in place
-- [ ] 1.3 `npm run test` passes, including new unit and property tests
+- [x] 1.1 `npm run lint` passes
+- [x] 1.2 Type checking passes with the new fields in place
+- [x] 1.3 `npm run test` passes, including new unit and property tests
 
 ### Phase 2: UI Integration (Fit-Check Form & Result)
 

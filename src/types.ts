@@ -3,6 +3,7 @@ export interface GoodsItemInput {
   length: number;
   width: number;
   height: number;
+  weight: number;
   quantity: number;
   rotatable: boolean;
   stackable: boolean;
@@ -12,6 +13,7 @@ export interface VehicleDimensionsInput {
   length: number;
   width: number;
   height: number;
+  maxPayload: number;
 }
 
 export interface FitCheckRequest {
@@ -48,6 +50,7 @@ export interface FitCheckResult {
   placements: PlacedUnit[];
   layers: LayerGrid[];
   utilizationPercent: number;
+  weightUtilizationPercent: number;
 }
 
 export interface VehicleProfile {

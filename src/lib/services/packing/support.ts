@@ -8,10 +8,12 @@ export interface SupportCandidate {
   z: number;
   length: number;
   width: number;
+  weight: number;
 }
 
 export interface SupportingUnit extends PlacedBox {
   stackable: boolean;
+  weight: number;
 }
 
 export function isFullySupported(candidate: SupportCandidate, placed: SupportingUnit[]): boolean {
@@ -22,7 +24,7 @@ export function isFullySupported(candidate: SupportCandidate, placed: Supporting
 
   let covered = 0;
   for (const unit of placed) {
-    if (!unit.stackable) continue;
+    if (!unit.stackable || unit.weight + EPSILON < candidate.weight) continue;
 
     const topZ = unit.z + unit.height;
     if (Math.abs(topZ - candidate.z) > EPSILON) continue;

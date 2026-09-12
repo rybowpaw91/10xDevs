@@ -41,7 +41,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID              | Outcome (user can …)                                                                                                    | Prerequisites | PRD refs                          | Status |
 | ---- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------------- | ------ |
-| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | planning |
+| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | in-progress |
 
 ## Baseline
 
@@ -72,7 +72,7 @@ No Foundations for this milestone. Every FR this milestone covers (FR-001 amendm
 - **Blockers:** —
 - **Unknowns:** — (resolved during `/10x-plan`: saved goods-item templates and vehicle profiles will NOT gain a weight field in this change — deferred to a possible follow-up; see Parked)
 - **Risk:** Extends the core packing heuristic's placement/support logic (not just a post-hoc pass/fail gate) to also weigh mass when deciding what can stack on what — a larger algorithmic surface than a simple weight-cap check alone, but already scoped and accepted via the PRD's own Socrates resolution on FR-010 ("the user explicitly wants weight to affect packing order, not just a pass/fail gate; the increased algorithmic scope is deliberate, not incidental").
-- **Status:** planning
+- **Status:** in-progress
 
 ## Backlog Handoff
 
