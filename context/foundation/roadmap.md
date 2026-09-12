@@ -41,7 +41,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID              | Outcome (user can …)                                                                                                    | Prerequisites | PRD refs                          | Status |
 | ---- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------------- | ------ |
-| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | in-progress |
+| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | done |
 
 ## Baseline
 
@@ -72,7 +72,7 @@ No Foundations for this milestone. Every FR this milestone covers (FR-001 amendm
 - **Blockers:** —
 - **Unknowns:** — (resolved during `/10x-plan`: saved goods-item templates and vehicle profiles will NOT gain a weight field in this change — deferred to a possible follow-up; see Parked)
 - **Risk:** Extends the core packing heuristic's placement/support logic (not just a post-hoc pass/fail gate) to also weigh mass when deciding what can stack on what — a larger algorithmic surface than a simple weight-cap check alone, but already scoped and accepted via the PRD's own Socrates resolution on FR-010 ("the user explicitly wants weight to affect packing order, not just a pass/fail gate; the increased algorithmic scope is deliberate, not incidental").
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -104,3 +104,4 @@ _None._ The PRD's own `## Open Questions` section reported none. The one real op
 - **S-01: user can enter a goods list (dimensions, quantity, rotation and stackable flags per item) and a vehicle's cargo dimensions, submit once, and see whether everything fits, a recommended packing order (text + lightweight grid), and the volume-utilization percentage.** — Archived 2026-09-10 → `context/archive/2026-09-09-single-trip-fit-check/`. Lesson: —.
 - **S-01: user can save a vehicle's cargo dimensions as a named profile from the fit-check page, and select that saved profile — alongside the existing hardcoded presets and manual entry — on a later visit to prefill the vehicle fields.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-vehicle-profile/`. Lesson: —.
 - **S-02: user can save a single goods item — label, dimensions, whether it can be rotated, whether other items can be stacked on it — as a reusable template from the fit-check page, and load a previously saved item template into the form on a later visit instead of re-entering its fields, mirroring S-01's vehicle-profile pattern applied to one goods item at a time.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-goods-item/`. Lesson: —.
+- **S-01: user can enter each goods item's weight and the vehicle's maximum payload alongside the existing dimension fields, submit once, and see: a fit determination where exceeding the vehicle's maximum payload always means "doesn't fit" (even if it fits by volume), a packing order that never places a heavier item above a lighter one, and a weight-utilization percentage shown next to the existing volume-utilization percentage.** — Archived 2026-09-12 → `context/archive/2026-09-12-weight-aware-fit-check/`. Lesson: —.
