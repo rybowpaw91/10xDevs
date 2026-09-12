@@ -1,7 +1,7 @@
 ---
 change_id: edit-vehicle-profile
 title: Edit saved vehicle profile
-status: planned
+status: implementing
 created: 2026-09-12
 updated: 2026-09-12
 archived_at: null

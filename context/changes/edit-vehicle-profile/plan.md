@@ -205,13 +205,13 @@ Additive only — a new RLS policy on an existing table, no data migration. Roll
 
 #### Automated
 
-- [ ] 1.1 `npx supabase start` succeeds and the migration applies cleanly
-- [ ] 1.2 `npm run lint` passes
-- [ ] 1.3 Type checking passes
+- [x] 1.1 `npx supabase start` succeeds and the migration applies cleanly
+- [x] 1.2 `npm run lint` passes
+- [x] 1.3 Type checking passes
 
 #### Manual
 
-- [ ] 1.4 Exactly four policies exist on `vehicle_profiles`, all scoped `to authenticated`
+- [x] 1.4 Exactly four policies exist on `vehicle_profiles`, all scoped `to authenticated`
 
 ### Phase 2: API Route — PATCH Handler
 

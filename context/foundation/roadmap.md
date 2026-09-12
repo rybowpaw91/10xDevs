@@ -43,7 +43,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID                   | Outcome (user can …)                                                                 | Prerequisites | PRD refs | Status |
 | ---- | ---------------------------- | -------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
-| S-01 | `edit-vehicle-profile`       | Edit a saved vehicle profile's label and dimensions in place                           | —              | MS-01    | planning |
+| S-01 | `edit-vehicle-profile`       | Edit a saved vehicle profile's label and dimensions in place                           | —              | MS-01    | in-progress |
 | S-02 | `edit-goods-item-template`   | Edit a saved goods-item template's label, dimensions, rotatable, and stackable in place | —              | MS-02    | ready  |
 
 ## Baseline
@@ -74,7 +74,7 @@ No Foundations for this milestone. Adding an `UPDATE` RLS policy + a `PATCH`/`PU
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This table has never had an `UPDATE` RLS policy before — getting its per-user access-control policy right (scoped `to authenticated`, `auth.uid() = user_id` on both `using` and `with check`) matters more than the feature's small surface suggests, same category of risk M-2's S-01 flagged for its original `INSERT`/`DELETE` policies.
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-02: User edits a saved goods-item template
 
