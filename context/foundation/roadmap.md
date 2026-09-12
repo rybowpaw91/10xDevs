@@ -3,7 +3,7 @@ project: LoadFit
 version: 1
 status: draft
 created: 2026-09-09
-updated: 2026-09-11
+updated: 2026-09-12
 prd_version: 3
 main_goal: low-complexity
 top_blocker: capacity
@@ -41,7 +41,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 
 | ID   | Change ID              | Outcome (user can …)                                                                                                    | Prerequisites | PRD refs                          | Status |
 | ---- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------------- | ------ |
-| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | ready  |
+| S-01 | `weight-aware-fit-check` | Enter each item's weight and the vehicle's max payload, and get a fit/packing/utilization result that's weight-aware, not just volume-aware | —              | FR-001, FR-002, FR-009, FR-010, FR-011, US-01 | planning |
 
 ## Baseline
 
@@ -70,10 +70,9 @@ No Foundations for this milestone. Every FR this milestone covers (FR-001 amendm
 - **Prerequisites:** — (builds entirely on the already-shipped, stateless M-1 fit-check feature; no auth or persistence changes needed)
 - **Parallel with:** — (only slice in this milestone)
 - **Blockers:** —
-- **Unknowns:**
-  - Should the already-shipped saved goods-item templates (FR-007) and vehicle profiles (FR-008) also gain a weight field in this milestone, so loading a saved item/profile doesn't leave weight blank and require re-entry every time? — Owner: user. Block: no (S-01 is fully shippable and verifiable without deciding this — weight can simply be typed fresh on every submission, same as any other field before a template/profile covers it; this is a scope-widening option, not a dependency).
+- **Unknowns:** — (resolved during `/10x-plan`: saved goods-item templates and vehicle profiles will NOT gain a weight field in this change — deferred to a possible follow-up; see Parked)
 - **Risk:** Extends the core packing heuristic's placement/support logic (not just a post-hoc pass/fail gate) to also weigh mass when deciding what can stack on what — a larger algorithmic surface than a simple weight-cap check alone, but already scoped and accepted via the PRD's own Socrates resolution on FR-010 ("the user explicitly wants weight to affect packing order, not just a pass/fail gate; the increased algorithmic scope is deliberate, not incidental").
-- **Status:** ready
+- **Status:** planning
 
 ## Backlog Handoff
 
@@ -93,7 +92,7 @@ _None._ The PRD's own `## Open Questions` section reported none. The one real op
 - **No 2D/3D visual load rendering.** Why parked: PRD Non-Goal — cut during MVP scoping after a timeline-cost check; explicit v2 candidate.
 - **No multi-vehicle fleet assignment or managing multiple simultaneous loads.** Why parked: PRD Non-Goal — the locked persona plans one vehicle, one load, one trip at a time.
 - **Apply the same in-dropdown delete UX to the saved vehicle-profile select (S-01 of M-2).** Why parked: user feedback during M-2's `save-goods-item` Phase 3 manual testing (2026-09-11) asked for saved goods-item templates to be deletable via a small icon button inside their dropdown option, instead of a separate management list — the vehicle-profile select still uses the older separate-list pattern. Candidate for a small follow-up change for UI consistency across both saved-entity types. See `context/archive/2026-09-11-save-goods-item/change.md` Notes.
-- **Adding a weight field to saved goods-item templates (FR-007) and vehicle profiles (FR-008).** Why parked: not declared by any PRD FR — FR-007/FR-008 as written only cover label, dimensions, rotatable, stackable (goods items) and label, dimensions (vehicles). Surfaced as an Unknown on S-01 instead of invented as new scope; revisit once S-01 ships and it's clear whether re-typing weight every time a saved item/profile is used is actually a real friction point worth a follow-up change.
+- **Adding a weight field to saved goods-item templates (FR-007) and vehicle profiles (FR-008).** Why parked: not declared by any PRD FR — FR-007/FR-008 as written only cover label, dimensions, rotatable, stackable (goods items) and label, dimensions (vehicles). User-confirmed during `/10x-plan weight-aware-fit-check` (2026-09-12): explicitly deferred, not folded into S-01. Revisit once S-01 ships and it's clear whether re-typing weight every time a saved item/profile is used is actually a real friction point worth a follow-up change.
 
 ## Milestone History
 
