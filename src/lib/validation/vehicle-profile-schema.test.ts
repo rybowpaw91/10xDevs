@@ -8,6 +8,7 @@ describe("vehicleProfileInputSchema", () => {
       length: 250,
       width: 160,
       height: 135,
+      maxPayload: 800,
     });
     expect(result.success).toBe(true);
   });
@@ -17,6 +18,7 @@ describe("vehicleProfileInputSchema", () => {
       length: 250,
       width: 160,
       height: 135,
+      maxPayload: 800,
     });
     expect(result.success).toBe(false);
   });
@@ -27,6 +29,7 @@ describe("vehicleProfileInputSchema", () => {
       length: 250,
       width: 160,
       height: 135,
+      maxPayload: 800,
     });
     expect(result.success).toBe(false);
   });
@@ -37,6 +40,7 @@ describe("vehicleProfileInputSchema", () => {
       length: 0,
       width: 160,
       height: 135,
+      maxPayload: 800,
     });
     expect(result.success).toBe(false);
   });
@@ -47,6 +51,7 @@ describe("vehicleProfileInputSchema", () => {
       length: 250,
       width: -160,
       height: 135,
+      maxPayload: 800,
     });
     expect(result.success).toBe(false);
   });
@@ -57,6 +62,28 @@ describe("vehicleProfileInputSchema", () => {
       length: "250",
       width: 160,
       height: 135,
+      maxPayload: 800,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a missing max payload", () => {
+    const result = vehicleProfileInputSchema.safeParse({
+      label: "My van",
+      length: 250,
+      width: 160,
+      height: 135,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a non-positive max payload", () => {
+    const result = vehicleProfileInputSchema.safeParse({
+      label: "My van",
+      length: 250,
+      width: 160,
+      height: 135,
+      maxPayload: 0,
     });
     expect(result.success).toBe(false);
   });

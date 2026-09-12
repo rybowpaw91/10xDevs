@@ -60,6 +60,7 @@ export interface VehicleProfile {
   length: number;
   width: number;
   height: number;
+  maxPayload: number | null;
 }
 
 export interface GoodsItemTemplate {

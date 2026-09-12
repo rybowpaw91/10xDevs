@@ -161,6 +161,37 @@ Add an inline edit affordance to the saved-profiles list: edit-in-place with a c
 
 ---
 
+### Addendum: Scope revision (2026-09-12) — dropdown-only UI, edit+delete in dropdown, max payload field
+
+Mid-implementation of this phase, after the original inline-edit-in-a-list design above was already built and manually spot-checked, the user gave this feedback: *"do not list all currenty saved vehicles and items, it should be visible only in dropdown. Max payload should also be editable. Edit and remove from db icon should be in dropdown. Weight and payload should be also in db and be editable."* Follow-up clarification scoped this to vehicles only for this change (goods-item-template weight stays a separate future change, S-02), confirmed the edit affordance should open a modal dialog rather than editing inline in a list row, and confirmed a single Save-in-the-dialog action is enough — no extra confirmation step is needed beyond that.
+
+This supersedes the original Phase 3 design described above (the separate saved-profiles management list, the confirm-before-save inline flow) and un-parks max payload, which "What We're NOT Doing" and the original plan's Overview had explicitly left out of scope. Concretely:
+
+- **The separate saved-profiles list UI is removed entirely.** Saved vehicle profiles are visible only inside the vehicle preset `<Select>` dropdown, mirroring how `goods_item_templates` already work in this same component — there is no independent list section on the page anymore.
+- **Edit and Delete actions live inside the dropdown**, not in a standalone list row. Each saved-profile `SelectItem` is a raw `SelectPrimitive.Item` (not the wrapped `SelectItem`) carrying two nested icon buttons (`Pencil` for edit, `Trash2` for delete, from `lucide-react`), each using `onPointerDown`/`onPointerUp`/`onClick` with `e.stopPropagation()` so clicking them doesn't also select that preset — the same nested-interactive-element pattern already used for template deletion in this component. Keyboard equivalents: `Delete`/`Backspace` deletes the focused item, `F2` opens it for editing (chosen over a printable key to avoid colliding with Radix Select's built-in typeahead).
+- **Editing opens a modal `<Dialog>`** (shadcn `dialog.tsx`, newly installed) with Label, Length, Width, Height, and Max payload fields. Save calls the PATCH endpoint directly — no separate confirmation step (the original plan's "Confirmation step, not a native `confirm()`" critical detail is superseded by this decision). The now-unused `alert-dialog.tsx` (installed for the original design) was removed.
+- **Max payload becomes a real, editable, database-backed field**, not merely UI-adjacent: a new nullable `max_payload numeric check (max_payload > 0)` column on `vehicle_profiles` (additive migration, no backfill — existing rows read back as `maxPayload: null`), required going forward by `vehicleProfileInputSchema` (`z.number().positive()`), threaded through `VehicleProfile` (`src/types.ts`), both API routes' `.select()` aliasing (`maxPayload:max_payload`) and insert/update payload construction (destructure `maxPayload` out, write back as `max_payload`), and the create form, dropdown display, and edit dialog in `GoodsFitForm.tsx`.
+- **Live-form sync** is preserved from the original plan: a successful edit of the currently-selected profile updates `vehicle.length/width/height` *and now also* `vehicle.maxPayload` in the live form.
+
+No changes to Phase 1 or Phase 2's RLS/PATCH-handler shape — this addendum only extends the row shape (one new column, one new field in the existing validation schema) and reworks Phase 3's UI.
+
+#### Revised Manual Verification (supersedes the Phase 3 Manual Verification bullets above):
+
+- Saved vehicle profiles appear only inside the vehicle preset dropdown — no separate list is visible anywhere on the page
+- Each saved profile's dropdown entry shows working Edit (pencil) and Delete (trash) icon buttons that don't trigger preset selection when clicked
+- Clicking Edit (or pressing `F2` on a focused profile) opens a modal dialog pre-filled with that profile's label, dimensions, and max payload
+- Pressing `Delete`/`Backspace` on a focused profile deletes it without opening the dialog
+- Changing values in the dialog and clicking Save persists the change and closes the dialog; the dropdown reflects the new label/dimensions immediately
+- Cancel (or closing the dialog) discards the in-progress edit with no request sent
+- If the edited profile is currently selected, the Length/Width/Height/Max payload fields in the main form update to match after a successful save
+- If the edited profile is not currently selected, the main form fields are untouched by the edit
+- Max payload is required and editable in both the create-profile flow and the edit dialog
+- Signed-out visit to the fit-check page still redirects to sign-in (unchanged baseline)
+
+Everything checkable via direct API calls — create/PATCH with `maxPayload`, rejection when `maxPayload` is missing, backward-compatible `null` on pre-existing rows — was already verified directly (see Progress 3.10-3.13) and does not need to be re-checked by hand. Only the genuinely browser-only items above (dropdown rendering, icon-button click isolation, `F2`/`Delete` keyboard behavior, modal open/close, visual live-form sync) require human confirmation.
+
+---
+
 ## Testing Strategy
 
 ### Unit Tests:
@@ -217,31 +248,35 @@ Additive only — a new RLS policy on an existing table, no data migration. Roll
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 Type checking passes
-- [x] 2.3 `npm run build` succeeds with the new handler present
+- [x] 2.1 `npm run lint` passes — d3a284e
+- [x] 2.2 Type checking passes — d3a284e
+- [x] 2.3 `npm run build` succeeds with the new handler present — d3a284e
 
 #### Manual
 
-- [x] 2.4 Authenticated PATCH updates a profile (200 + updated row); subsequent GET reflects the change
-- [x] 2.5 Invalid PATCH body returns 400 with a clear message
-- [x] 2.6 PATCH on a nonexistent/non-UUID id returns 404/400
-- [x] 2.7 Unauthenticated PATCH is redirected/rejected
-- [x] 2.8 Two-user RLS isolation confirmed against the local Supabase instance
+- [x] 2.4 Authenticated PATCH updates a profile (200 + updated row); subsequent GET reflects the change — d3a284e
+- [x] 2.5 Invalid PATCH body returns 400 with a clear message — d3a284e
+- [x] 2.6 PATCH on a nonexistent/non-UUID id returns 404/400 — d3a284e
+- [x] 2.7 Unauthenticated PATCH is redirected/rejected — d3a284e
+- [x] 2.8 Two-user RLS isolation confirmed against the local Supabase instance — d3a284e
 
-### Phase 3: UI Integration (Inline Edit)
+### Phase 3: UI Integration (Dropdown-only edit/delete + max payload) — supersedes original inline-edit design, see addendum above
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 Type checking passes
-- [ ] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 Type checking passes
+- [x] 3.3 `npm run build` succeeds
+- [x] 3.10 `npm run test` passes (42/42, including new max-payload schema tests)
+- [x] 3.11 Verified via direct API calls against local Supabase: `POST` with `maxPayload` succeeds (201) and returns it; `POST` without `maxPayload` rejects (400) with a clear validation message
+- [x] 3.12 Verified via direct API calls: `PATCH` updating `maxPayload` succeeds (200) and returns the updated value
+- [x] 3.13 Verified via direct API calls: pre-existing rows created before the migration still `GET` correctly with `maxPayload: null` (backward compatibility)
 
 #### Manual
 
-- [ ] 3.4 Edit turns one row into editable fields without affecting others
-- [ ] 3.5 Save prompts confirmation; confirming persists the change and updates the list
-- [ ] 3.6 Declining confirmation or clicking Cancel leaves the profile unchanged
-- [ ] 3.7 Live form syncs when the edited profile is currently selected
-- [ ] 3.8 Live form untouched when the edited profile is not selected
-- [ ] 3.9 Signed-out visit still redirects to sign-in
+- [x] 3.4 Saved profiles appear only in the dropdown — no separate list is visible
+- [x] 3.5 Dropdown Edit/Delete icon buttons work and don't trigger preset selection
+- [x] 3.6 Edit (click or `F2`) opens the modal dialog pre-filled correctly; `Delete`/`Backspace` deletes without opening it
+- [x] 3.7 Save in the dialog persists the change and updates the dropdown; Cancel discards with no request sent
+- [x] 3.8 Live form (including max payload) syncs when the edited profile is currently selected, and is untouched when it is not
+- [x] 3.9 Signed-out visit still redirects to sign-in

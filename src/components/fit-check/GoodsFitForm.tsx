@@ -1,9 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { Plus, Trash2, PackageCheck, Save } from "lucide-react";
+import { Plus, Trash2, PackageCheck, Save, Pencil } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -43,6 +51,14 @@ interface GoodsRowState {
 
 interface VehicleState {
   presetId: string;
+  length: string;
+  width: string;
+  height: string;
+  maxPayload: string;
+}
+
+interface ProfileEditDraft {
+  label: string;
   length: string;
   width: string;
   height: string;
@@ -140,6 +156,11 @@ export default function GoodsFitForm() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
 
+  const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
+  const [profileEditDraft, setProfileEditDraft] = useState<ProfileEditDraft | null>(null);
+  const [profileEditError, setProfileEditError] = useState<string | null>(null);
+  const [savingProfileEdit, setSavingProfileEdit] = useState(false);
+
   const [savedItemTemplates, setSavedItemTemplates] = useState<GoodsItemTemplate[]>([]);
   const [itemTemplateError, setItemTemplateError] = useState<string | null>(null);
   const [savingItemTemplateKey, setSavingItemTemplateKey] = useState<string | null>(null);
@@ -203,14 +224,16 @@ export default function GoodsFitForm() {
     const preset = VEHICLE_PRESETS.find((candidate) => candidate.id === presetId);
     const profile = savedProfiles.find((candidate) => candidate.id === presetId);
     const source = preset ?? profile;
+    // A hardcoded preset always has a max payload; a saved profile might not (rows saved before
+    // this field existed have max_payload: null) — in that case leave whatever payload is already
+    // entered rather than clearing it.
+    const sourceMaxPayload = preset ? preset.maxPayload : profile?.maxPayload;
     setVehicle((prev) => ({
       presetId,
       length: source ? String(source.length) : prev.length,
       width: source ? String(source.width) : prev.width,
       height: source ? String(source.height) : prev.height,
-      // Saved vehicle profiles don't carry a max payload (deferred scope) — only a hardcoded
-      // preset can prefill it; selecting a profile leaves whatever payload is already entered.
-      maxPayload: preset ? String(preset.maxPayload) : prev.maxPayload,
+      maxPayload: sourceMaxPayload != null ? String(sourceMaxPayload) : prev.maxPayload,
     }));
   }
 
@@ -222,6 +245,7 @@ export default function GoodsFitForm() {
       length: Number(vehicle.length),
       width: Number(vehicle.width),
       height: Number(vehicle.height),
+      maxPayload: Number(vehicle.maxPayload),
     });
     if (!parsed.success) {
       setProfileError(collectZodErrors(z.treeifyError(parsed.error)).join(" "));
@@ -261,6 +285,72 @@ export default function GoodsFitForm() {
       }
     } catch {
       // Best-effort — leave the list as-is if the request fails.
+    }
+  }
+
+  function startEditProfile(profile: VehicleProfile) {
+    setEditingProfileId(profile.id);
+    setProfileEditDraft({
+      label: profile.label,
+      length: String(profile.length),
+      width: String(profile.width),
+      height: String(profile.height),
+      maxPayload: profile.maxPayload != null ? String(profile.maxPayload) : "",
+    });
+    setProfileEditError(null);
+  }
+
+  function cancelEditProfile() {
+    setEditingProfileId(null);
+    setProfileEditDraft(null);
+    setProfileEditError(null);
+  }
+
+  async function saveProfileEdit(id: string) {
+    if (!profileEditDraft) return;
+    setProfileEditError(null);
+
+    const parsed = vehicleProfileInputSchema.safeParse({
+      label: profileEditDraft.label.trim(),
+      length: Number(profileEditDraft.length),
+      width: Number(profileEditDraft.width),
+      height: Number(profileEditDraft.height),
+      maxPayload: Number(profileEditDraft.maxPayload),
+    });
+    if (!parsed.success) {
+      setProfileEditError(collectZodErrors(z.treeifyError(parsed.error)).join(" "));
+      return;
+    }
+
+    setSavingProfileEdit(true);
+    try {
+      const response = await fetch(`/api/vehicle-profiles/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!response.ok) {
+        setProfileEditError(`Could not save changes (status ${response.status}).`);
+        return;
+      }
+
+      const updated = (await response.json()) as VehicleProfile;
+      setSavedProfiles((prev) => prev.map((profile) => (profile.id === id ? updated : profile)));
+      if (vehicle.presetId === id) {
+        setVehicle((prev) => ({
+          ...prev,
+          length: String(updated.length),
+          width: String(updated.width),
+          height: String(updated.height),
+          maxPayload: updated.maxPayload != null ? String(updated.maxPayload) : prev.maxPayload,
+        }));
+      }
+      cancelEditProfile();
+    } catch {
+      setProfileEditError("Could not reach the server. Please try again.");
+    } finally {
+      setSavingProfileEdit(false);
     }
   }
 
@@ -400,9 +490,63 @@ export default function GoodsFitForm() {
                     <SelectGroup>
                       <SelectLabel>Saved profiles</SelectLabel>
                       {savedProfiles.map((profile) => (
-                        <SelectItem key={profile.id} value={profile.id}>
-                          {profile.label} ({profile.length}x{profile.width}x{profile.height} cm)
-                        </SelectItem>
+                        <SelectPrimitive.Item
+                          key={profile.id}
+                          value={profile.id}
+                          className="focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default items-center justify-between gap-2 rounded-sm py-1.5 pr-2 pl-2 text-sm outline-hidden select-none"
+                          // Edit/Delete below are nested interactive elements inside this role="option"
+                          // item, so they aren't Tab-reachable — F2/Delete on the focused option are
+                          // the keyboard paths to the same actions.
+                          onKeyDown={(e) => {
+                            if (e.key === "Delete" || e.key === "Backspace") {
+                              e.preventDefault();
+                              void deleteProfile(profile.id);
+                            } else if (e.key === "F2") {
+                              e.preventDefault();
+                              startEditProfile(profile);
+                            }
+                          }}
+                        >
+                          <SelectPrimitive.ItemText>
+                            {profile.label} ({profile.length}x{profile.width}x{profile.height} cm)
+                          </SelectPrimitive.ItemText>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              aria-label={`Edit ${profile.label}`}
+                              className="text-blue-700 hover:text-blue-900"
+                              onPointerDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onPointerUp={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startEditProfile(profile);
+                              }}
+                            >
+                              <Pencil className="size-4" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={`Delete ${profile.label}`}
+                              className="text-red-600 hover:text-red-800"
+                              onPointerDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onPointerUp={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                void deleteProfile(profile.id);
+                              }}
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          </div>
+                        </SelectPrimitive.Item>
                       ))}
                     </SelectGroup>
                   )}
@@ -482,6 +626,7 @@ export default function GoodsFitForm() {
             <Button
               type="button"
               variant="outline"
+              className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
               disabled={savingProfile}
               onClick={() => {
                 void saveProfile();
@@ -492,32 +637,93 @@ export default function GoodsFitForm() {
             </Button>
           </div>
           {profileError && <p className="mt-2 text-sm text-red-300">{profileError}</p>}
-
-          {savedProfiles.length > 0 && (
-            <div className="mt-3 space-y-2">
-              {savedProfiles.map((profile) => (
-                <div
-                  key={profile.id}
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-blue-100/80"
-                >
-                  <span>
-                    {profile.label} — {profile.length}x{profile.width}x{profile.height} cm
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-red-300 hover:text-red-200"
-                    onClick={() => {
-                      void deleteProfile(profile.id);
-                    }}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
         </section>
+
+        <Dialog
+          open={editingProfileId !== null}
+          onOpenChange={(open) => {
+            if (!open) cancelEditProfile();
+          }}
+        >
+          <DialogContent className="text-foreground">
+            <DialogHeader>
+              <DialogTitle>Edit vehicle profile</DialogTitle>
+              <DialogDescription>Update the saved label, dimensions, and max payload.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Label className="mb-1">Label</Label>
+                <Input
+                  value={profileEditDraft?.label ?? ""}
+                  onChange={(e) => {
+                    setProfileEditDraft((prev) => (prev ? { ...prev, label: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Length (cm)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={profileEditDraft?.length ?? ""}
+                  onChange={(e) => {
+                    setProfileEditDraft((prev) => (prev ? { ...prev, length: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Width (cm)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={profileEditDraft?.width ?? ""}
+                  onChange={(e) => {
+                    setProfileEditDraft((prev) => (prev ? { ...prev, width: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Height (cm)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={profileEditDraft?.height ?? ""}
+                  onChange={(e) => {
+                    setProfileEditDraft((prev) => (prev ? { ...prev, height: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Max payload (kg)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={profileEditDraft?.maxPayload ?? ""}
+                  onChange={(e) => {
+                    setProfileEditDraft((prev) => (prev ? { ...prev, maxPayload: e.target.value } : prev));
+                  }}
+                />
+              </div>
+            </div>
+            {profileEditError && <p className="text-sm text-red-300">{profileEditError}</p>}
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={cancelEditProfile}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={savingProfileEdit}
+                onClick={() => {
+                  if (editingProfileId) void saveProfileEdit(editingProfileId);
+                }}
+              >
+                <Save className="size-4" />
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <section>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -552,7 +758,7 @@ export default function GoodsFitForm() {
                           <button
                             type="button"
                             aria-label={`Delete ${template.label}`}
-                            className="text-red-300 hover:text-red-200"
+                            className="text-red-600 hover:text-red-800"
                             onPointerDown={(e) => {
                               e.stopPropagation();
                             }}
@@ -572,7 +778,12 @@ export default function GoodsFitForm() {
                   </SelectContent>
                 </Select>
               )}
-              <Button type="button" variant="outline" onClick={addRow}>
+              <Button
+                type="button"
+                variant="outline"
+                className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                onClick={addRow}
+              >
                 <Plus className="size-4" />
                 Add item
               </Button>

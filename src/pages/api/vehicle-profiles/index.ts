@@ -11,6 +11,7 @@ interface VehicleProfileRow {
   length: number;
   width: number;
   height: number;
+  maxPayload: number | null;
 }
 
 function jsonResponse(body: unknown, status: number): Response {
@@ -32,7 +33,7 @@ export const GET: APIRoute = async (context) => {
 
   const { data, error } = await supabase
     .from("vehicle_profiles")
-    .select("id, label, length, width, height")
+    .select("id, label, length, width, height, maxPayload:max_payload")
     .order("created_at", { ascending: false })
     .overrideTypes<VehicleProfileRow[], { merge: false }>();
 
@@ -65,10 +66,11 @@ export const POST: APIRoute = async (context) => {
     return jsonResponse({ error: "Supabase is not configured" }, 500);
   }
 
+  const { maxPayload, ...dimensions } = parsed.data;
   const { data, error } = await supabase
     .from("vehicle_profiles")
-    .insert({ ...parsed.data, user_id: context.locals.user.id })
-    .select("id, label, length, width, height")
+    .insert({ ...dimensions, max_payload: maxPayload, user_id: context.locals.user.id })
+    .select("id, label, length, width, height, maxPayload:max_payload")
     .single()
     .overrideTypes<VehicleProfileRow, { merge: false }>();
 
