@@ -264,19 +264,19 @@ Additive only — a new RLS policy on an existing table, no data migration. Roll
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 Type checking passes
-- [x] 3.3 `npm run build` succeeds
-- [x] 3.10 `npm run test` passes (42/42, including new max-payload schema tests)
-- [x] 3.11 Verified via direct API calls against local Supabase: `POST` with `maxPayload` succeeds (201) and returns it; `POST` without `maxPayload` rejects (400) with a clear validation message
-- [x] 3.12 Verified via direct API calls: `PATCH` updating `maxPayload` succeeds (200) and returns the updated value
-- [x] 3.13 Verified via direct API calls: pre-existing rows created before the migration still `GET` correctly with `maxPayload: null` (backward compatibility)
+- [x] 3.1 `npm run lint` passes — 294483a
+- [x] 3.2 Type checking passes — 294483a
+- [x] 3.3 `npm run build` succeeds — 294483a
+- [x] 3.10 `npm run test` passes (42/42, including new max-payload schema tests) — 294483a
+- [x] 3.11 Verified via direct API calls against local Supabase: `POST` with `maxPayload` succeeds (201) and returns it; `POST` without `maxPayload` rejects (400) with a clear validation message — 294483a
+- [x] 3.12 Verified via direct API calls: `PATCH` updating `maxPayload` succeeds (200) and returns the updated value — 294483a
+- [x] 3.13 Verified via direct API calls: pre-existing rows created before the migration still `GET` correctly with `maxPayload: null` (backward compatibility) — 294483a
 
 #### Manual
 
-- [x] 3.4 Saved profiles appear only in the dropdown — no separate list is visible
-- [x] 3.5 Dropdown Edit/Delete icon buttons work and don't trigger preset selection
-- [x] 3.6 Edit (click or `F2`) opens the modal dialog pre-filled correctly; `Delete`/`Backspace` deletes without opening it
-- [x] 3.7 Save in the dialog persists the change and updates the dropdown; Cancel discards with no request sent
-- [x] 3.8 Live form (including max payload) syncs when the edited profile is currently selected, and is untouched when it is not
-- [x] 3.9 Signed-out visit still redirects to sign-in
+- [x] 3.4 Saved profiles appear only in the dropdown — no separate list is visible — 294483a
+- [x] 3.5 Dropdown Edit/Delete icon buttons work and don't trigger preset selection — 294483a
+- [x] 3.6 Edit (click or `F2`) opens the modal dialog pre-filled correctly; `Delete`/`Backspace` deletes without opening it — 294483a
+- [x] 3.7 Save in the dialog persists the change and updates the dropdown; Cancel discards with no request sent — 294483a
+- [x] 3.8 Live form (including max payload) syncs when the edited profile is currently selected, and is untouched when it is not — 294483a
+- [x] 3.9 Signed-out visit still redirects to sign-in — 294483a
