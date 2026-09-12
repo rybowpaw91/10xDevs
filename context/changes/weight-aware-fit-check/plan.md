@@ -255,17 +255,17 @@ None — this feature is entirely stateless (no new tables, no schema migration)
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 Type checking passes
-- [x] 2.3 `npm run build` succeeds
+- [x] 2.1 `npm run lint` passes — 2eda54c
+- [x] 2.2 Type checking passes — 2eda54c
+- [x] 2.3 `npm run build` succeeds — 2eda54c
 
 #### Manual
 
-- [x] 2.4 Weight-over-payload load reports "doesn't fit" with a payload-specific reason showing the actual numbers, even when it fits by volume
-- [x] 2.5 Oversized-item no-fit shows each item's own dimensions alongside the vehicle's cargo dimensions
-- [x] 2.6 Successful fit shows both volume-utilization and weight-utilization percentages, numerically correct
-- [x] 2.7 "Preserve entry order" unchecked (default): heavier item ends up placed lower via reordering, never stacked above the lighter one
-- [x] 2.8 "Preserve entry order" checked: same input reports doesn't-fit naming the weight-based stacking rule, instead of reordering
-- [x] 2.9 Vehicle preset selection prefills max payload alongside dimensions
-- [x] 2.10 Saved vehicle profile selection prefills dimensions but leaves max payload untouched
-- [x] 2.11 Signed-out visit still redirects to sign-in
+- [x] 2.4 Weight-over-payload load reports "doesn't fit" with a payload-specific reason showing the actual numbers, even when it fits by volume — 2eda54c
+- [x] 2.5 Oversized-item no-fit shows each item's own dimensions alongside the vehicle's cargo dimensions — 2eda54c
+- [x] 2.6 Successful fit shows both volume-utilization and weight-utilization percentages, numerically correct — 2eda54c
+- [x] 2.7 "Preserve entry order" unchecked (default): heavier item ends up placed lower via reordering, never stacked above the lighter one — 2eda54c
+- [x] 2.8 "Preserve entry order" checked: same input reports doesn't-fit naming the weight-based stacking rule, instead of reordering — 2eda54c
+- [x] 2.9 Vehicle preset selection prefills max payload alongside dimensions — 2eda54c
+- [x] 2.10 Saved vehicle profile selection prefills dimensions but leaves max payload untouched — 2eda54c
+- [x] 2.11 Signed-out visit still redirects to sign-in — 2eda54c
