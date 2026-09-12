@@ -44,7 +44,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 | ID   | Change ID                   | Outcome (user can …)                                                                 | Prerequisites | PRD refs | Status |
 | ---- | ---------------------------- | -------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
 | S-01 | `edit-vehicle-profile`       | Edit a saved vehicle profile's label and dimensions in place                           | —              | MS-01    | done |
-| S-02 | `edit-goods-item-template`   | Edit a saved goods-item template's label, dimensions, rotatable, and stackable in place | —              | MS-02    | ready  |
+| S-02 | `edit-goods-item-template`   | Edit a saved goods-item template's label, dimensions, rotatable, and stackable in place | —              | MS-02    | in-progress  |
 
 ## Baseline
 
@@ -86,7 +86,7 @@ No Foundations for this milestone. Adding an `UPDATE` RLS policy + a `PATCH`/`PU
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Low — direct structural mirror of S-01 once its `UPDATE`-policy pattern exists (or built independently in parallel with the same shape).
-- **Status:** ready
+- **Status:** in-progress
 
 ## Backlog Handoff
 
