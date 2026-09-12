@@ -205,29 +205,29 @@ Additive only — a new RLS policy on an existing table, no data migration. Roll
 
 #### Automated
 
-- [x] 1.1 `npx supabase start` succeeds and the migration applies cleanly
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 Type checking passes
+- [x] 1.1 `npx supabase start` succeeds and the migration applies cleanly — a4d6a89
+- [x] 1.2 `npm run lint` passes — a4d6a89
+- [x] 1.3 Type checking passes — a4d6a89
 
 #### Manual
 
-- [x] 1.4 Exactly four policies exist on `vehicle_profiles`, all scoped `to authenticated`
+- [x] 1.4 Exactly four policies exist on `vehicle_profiles`, all scoped `to authenticated` — a4d6a89
 
 ### Phase 2: API Route — PATCH Handler
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 Type checking passes
-- [ ] 2.3 `npm run build` succeeds with the new handler present
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 Type checking passes
+- [x] 2.3 `npm run build` succeeds with the new handler present
 
 #### Manual
 
-- [ ] 2.4 Authenticated PATCH updates a profile (200 + updated row); subsequent GET reflects the change
-- [ ] 2.5 Invalid PATCH body returns 400 with a clear message
-- [ ] 2.6 PATCH on a nonexistent/non-UUID id returns 404/400
-- [ ] 2.7 Unauthenticated PATCH is redirected/rejected
-- [ ] 2.8 Two-user RLS isolation confirmed against the local Supabase instance
+- [x] 2.4 Authenticated PATCH updates a profile (200 + updated row); subsequent GET reflects the change
+- [x] 2.5 Invalid PATCH body returns 400 with a clear message
+- [x] 2.6 PATCH on a nonexistent/non-UUID id returns 404/400
+- [x] 2.7 Unauthenticated PATCH is redirected/rejected
+- [x] 2.8 Two-user RLS isolation confirmed against the local Supabase instance
 
 ### Phase 3: UI Integration (Inline Edit)
 
