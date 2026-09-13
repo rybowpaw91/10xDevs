@@ -260,11 +260,14 @@ describe("runFitCheck", () => {
     expect(heavy?.position.z).toBeLessThan(light?.position.z ?? Infinity);
   });
 
-  it("free order: never places a rotatable heavier item above a lighter stackable item, even though rotation gives it a footprint that would geometrically fit there", () => {
+  it("free order: heaviest-first ordering picks a valid rotation and lands the heavier item at the bottom, not above the lighter one", () => {
     // Vehicle footprint exactly matches "light"'s footprint, and height fits exactly two layers, so
     // stacking is the only way both items can be placed. "heavy" is rotatable and one of its
-    // rotations exactly matches that footprint too — proving rotation flexibility alone is never
-    // used to bypass the weight-based stacking rule (FR-010).
+    // rotations exactly matches that footprint too. Note: with preserveOrder: false, heaviest-first
+    // ordering always attempts "heavy" first against an empty placed list, where ground-level support
+    // is trivial — so this test does NOT independently exercise the FR-010 weight-stacking gate itself
+    // (a disabled gate would pass here too). That gate is proven by the "preserve order" test below,
+    // which forces the algorithm to actually evaluate it.
     const request: FitCheckRequest = {
       vehicle: { length: 50, width: 50, height: 20, maxPayload: 1000 },
       items: [

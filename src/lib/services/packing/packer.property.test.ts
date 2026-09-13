@@ -125,6 +125,9 @@ describe("runFitCheck property: weight-based stacking", () => {
 // stack, is a rare emergent event. Measured empirically: with the FR-010 check disabled, a combined
 // property driven only by requestArb caught the regression in under a third of runs. stackForcingArb
 // exists specifically to make stacking (and weight-order violations) common instead of incidental.
+// Note: whenever the bottom-most unit is generated with stackable: false, the run resolves to
+// fits:false before the weight-order assertion below ever executes — so the effective sample size
+// for that specific sub-check, per invocation, is smaller than `numRuns` suggests.
 const stackForcingArb: fc.Arbitrary<FitCheckRequest> = fc.integer({ min: 2, max: 4 }).chain((unitCount) =>
   fc
     .record({

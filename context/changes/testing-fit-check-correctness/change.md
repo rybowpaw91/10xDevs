@@ -1,7 +1,7 @@
 ---
 change_id: testing-fit-check-correctness
 title: Harden fit-check correctness guarantees
-status: implemented
+status: impl_reviewed
 created: 2026-09-13
 updated: 2026-09-14
 archived_at: null
