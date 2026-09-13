@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "F=$(node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{const j=JSON.parse(d);process.stdout.write((j.tool_input&&j.tool_input.file_path)||'')}catch(e){}})\"); case \"$F\" in *.ts|*.tsx|*.astro) OUT=$(npx eslint --fix \"$F\" 2>&1); CODE=$?; if [ $CODE -ne 0 ]; then echo \"$OUT\"; exit 2; fi ;; esac",
+            "timeout": 20,
+            "statusMessage": "Linting edited file..."
+          },
+          {
+            "type": "command",
+            "command": "F=$(node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{const j=JSON.parse(d);process.stdout.write((j.tool_input&&j.tool_input.file_path)||'')}catch(e){}})\"); case \"$F\" in *.ts|*.tsx) OUT=$(npx tsc --noEmit 2>&1); CODE=$?; if [ $CODE -ne 0 ]; then echo \"$OUT\"; exit 2; fi ;; esac",
+            "timeout": 30,
+            "statusMessage": "Type-checking project..."
+          }
+        ]
+      }
+    ]
+  }
+}
