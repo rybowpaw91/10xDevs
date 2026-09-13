@@ -1,7 +1,7 @@
 ---
 change_id: edit-goods-item-template
 title: Edit saved goods-item template
-status: implementing
+status: implemented
 created: 2026-09-13
 updated: 2026-09-13
 archived_at: null

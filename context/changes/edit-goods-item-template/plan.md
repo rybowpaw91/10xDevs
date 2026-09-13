@@ -269,36 +269,36 @@ Additive only — a new RLS policy and a new nullable column on an existing tabl
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 Type checking passes
-- [x] 2.3 `npm run build` succeeds with the new handler present
-- [x] 2.4 `npm run test` passes, including the new schema test cases
+- [x] 2.1 `npm run lint` passes — f2a2fb1
+- [x] 2.2 Type checking passes — f2a2fb1
+- [x] 2.3 `npm run build` succeeds with the new handler present — f2a2fb1
+- [x] 2.4 `npm run test` passes, including the new schema test cases — f2a2fb1
 
 #### Manual
 
-- [x] 2.5 Authenticated PATCH updates a template (200 + updated row, including weight); subsequent GET reflects the change
-- [x] 2.6 Invalid PATCH body (missing/non-positive weight, missing label) returns 400 with a clear message
-- [x] 2.7 PATCH on a nonexistent/non-UUID id returns 404/400
-- [x] 2.8 Unauthenticated PATCH is redirected/rejected
-- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance
-- [x] 2.10 POST without weight returns 400; GET on a pre-migration template returns weight: null
+- [x] 2.5 Authenticated PATCH updates a template (200 + updated row, including weight); subsequent GET reflects the change — f2a2fb1
+- [x] 2.6 Invalid PATCH body (missing/non-positive weight, missing label) returns 400 with a clear message — f2a2fb1
+- [x] 2.7 PATCH on a nonexistent/non-UUID id returns 404/400 — f2a2fb1
+- [x] 2.8 Unauthenticated PATCH is redirected/rejected — f2a2fb1
+- [x] 2.9 Two-user RLS isolation confirmed against the local Supabase instance — f2a2fb1
+- [x] 2.10 POST without weight returns 400; GET on a pre-migration template returns weight: null — f2a2fb1
 
 ### Phase 3: UI Integration (Dropdown Edit/Delete + weight)
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 Type checking passes
-- [x] 3.3 `npm run build` succeeds
-- [x] 3.4 `npm run test` passes
+- [x] 3.1 `npm run lint` passes — 915c193
+- [x] 3.2 Type checking passes — 915c193
+- [x] 3.3 `npm run build` succeeds — 915c193
+- [x] 3.4 `npm run test` passes — 915c193
 
 #### Manual
 
-- [x] 3.5 Dropdown shows working Edit/Delete icon buttons that don't trigger selection
-- [x] 3.6 Edit (click or F2) opens the modal dialog pre-filled correctly
-- [x] 3.7 Delete/Backspace still deletes without opening the dialog (regression check)
-- [x] 3.8 Save persists the change and updates the dropdown, including label text; Cancel discards with no request sent
-- [x] 3.9 Saving a new template captures the row's current weight
-- [x] 3.10 Loading a template prefills the new row's weight
-- [x] 3.11 Weight required and editable in both create and edit flows
-- [x] 3.12 Signed-out visit still redirects to sign-in
+- [x] 3.5 Dropdown shows working Edit/Delete icon buttons that don't trigger selection — 915c193
+- [x] 3.6 Edit (click or F2) opens the modal dialog pre-filled correctly — 915c193
+- [x] 3.7 Delete/Backspace still deletes without opening the dialog (regression check) — 915c193
+- [x] 3.8 Save persists the change and updates the dropdown, including label text; Cancel discards with no request sent — 915c193
+- [x] 3.9 Saving a new template captures the row's current weight — 915c193
+- [x] 3.10 Loading a template prefills the new row's weight — 915c193
+- [x] 3.11 Weight required and editable in both create and edit flows — 915c193
+- [x] 3.12 Signed-out visit still redirects to sign-in — 915c193
