@@ -9,7 +9,7 @@ main_goal: low-complexity
 top_blocker: capacity
 milestone_id: editable-saved-data
 milestone_seq: 4
-milestone_status: open
+milestone_status: done
 ---
 
 # Roadmap: LoadFit
@@ -20,7 +20,7 @@ milestone_status: open
 
 ## Milestone
 
-**M-4: Editable saved data** — Status: open
+**M-4: Editable saved data** — Status: done
 
 - **Intent:** Let a user correct or update a saved vehicle profile or goods-item template in place, instead of the current delete-and-re-save-only workflow. Both tables were built save/list/delete-only in M-2, with no UPDATE RLS policy on either — this milestone adds real edit support to both.
 - **Source materials:** user description (2026-09-12): "obecnie chce dodac mozliwosc edytowania zapisanych w bazie pojazdow i itemow" (want to add the ability to edit saved vehicles and items in the database).
@@ -114,6 +114,7 @@ _None._ This milestone is self-described (no PRD to cross-check); no cross-cutti
 - **M-1: First fit-check** (`first-fit-check`) — closed 2026-09-10. Proved the core hypothesis: a user can submit a goods list and a vehicle's cargo dimensions and receive a correct fit/no-fit determination, a packing order, and a volume-utilization percentage (S-01, `single-trip-fit-check`).
 - **M-2: Save and reuse** (`save-and-reuse`) — closed 2026-09-11. A logged-in user can save a vehicle profile and a goods item template from the fit-check page, and run a full fit check by loading both from saved data instead of retyping them (S-01 `save-vehicle-profile`, S-02 `save-goods-item`).
 - **M-3: Weight-aware loading** (`weight-aware-loading`) — closed 2026-09-12. A user's fit check is now weight-aware: exceeding the vehicle's maximum payload always means "doesn't fit" even if it fits by volume, the packing order never stacks a heavier item above a lighter one, and a weight-utilization percentage is shown alongside the volume one (S-01, `weight-aware-fit-check`).
+- **M-4: Editable saved data** (`editable-saved-data`) — closed 2026-09-13. A logged-in user can edit a previously saved vehicle profile's label and dimensions in place, and edit a previously saved goods-item template's label, dimensions, rotatable, and stackable flags in place, instead of the delete-and-re-save-only workflow both had since M-2 (S-01 `edit-vehicle-profile`, S-02 `edit-goods-item-template`). Along the way, both tables also gained a previously-parked `weight`/`maxPayload` field, made editable too.
 
 ## Done
 
