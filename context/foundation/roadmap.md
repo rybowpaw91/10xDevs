@@ -44,7 +44,7 @@ LoadFit replaces ad-hoc, by-eye or spreadsheet load planning for dispatchers, wa
 | ID   | Change ID                   | Outcome (user can …)                                                                 | Prerequisites | PRD refs | Status |
 | ---- | ---------------------------- | -------------------------------------------------------------------------------------- | -------------- | -------- | ------ |
 | S-01 | `edit-vehicle-profile`       | Edit a saved vehicle profile's label and dimensions in place                           | —              | MS-01    | done |
-| S-02 | `edit-goods-item-template`   | Edit a saved goods-item template's label, dimensions, rotatable, and stackable in place | —              | MS-02    | in-progress  |
+| S-02 | `edit-goods-item-template`   | Edit a saved goods-item template's label, dimensions, rotatable, and stackable in place | —              | MS-02    | done  |
 
 ## Baseline
 
@@ -86,7 +86,7 @@ No Foundations for this milestone. Adding an `UPDATE` RLS policy + a `PATCH`/`PU
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Low — direct structural mirror of S-01 once its `UPDATE`-policy pattern exists (or built independently in parallel with the same shape).
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -122,3 +122,4 @@ _None._ This milestone is self-described (no PRD to cross-check); no cross-cutti
 - **S-02: user can save a single goods item — label, dimensions, whether it can be rotated, whether other items can be stacked on it — as a reusable template from the fit-check page, and load a previously saved item template into the form on a later visit instead of re-entering its fields, mirroring S-01's vehicle-profile pattern applied to one goods item at a time.** — Archived 2026-09-11 → `context/archive/2026-09-11-save-goods-item/`. Lesson: —.
 - **S-01: user can enter each goods item's weight and the vehicle's maximum payload alongside the existing dimension fields, submit once, and see: a fit determination where exceeding the vehicle's maximum payload always means "doesn't fit" (even if it fits by volume), a packing order that never places a heavier item above a lighter one, and a weight-utilization percentage shown next to the existing volume-utilization percentage.** — Archived 2026-09-12 → `context/archive/2026-09-12-weight-aware-fit-check/`. Lesson: —.
 - **S-01: user can edit a previously saved vehicle profile's label and dimensions in place, instead of deleting and re-saving it.** — Archived 2026-09-13 → `context/archive/2026-09-12-edit-vehicle-profile/`. Lesson: —.
+- **S-02: user can edit a previously saved goods-item template's label, dimensions, whether it can be rotated, and whether other items can be stacked on it, in place, instead of deleting and re-saving it.** — Archived 2026-09-13 → `context/archive/2026-09-13-edit-goods-item-template/`. Lesson: —.
