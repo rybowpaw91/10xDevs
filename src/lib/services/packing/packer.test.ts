@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FitCheckRequest, PlacedUnit } from "@/types";
-import { boxesOverlap } from "./geometry";
+import { boxesOverlap, getEligibleOrientations } from "./geometry";
 import { runFitCheck } from "./packer";
 
 function assertNoOverlap(placements: PlacedUnit[]): void {
@@ -258,5 +258,76 @@ describe("runFitCheck", () => {
     const heavy = result.placements.find((p) => p.itemId === "heavy");
     const light = result.placements.find((p) => p.itemId === "light");
     expect(heavy?.position.z).toBeLessThan(light?.position.z ?? Infinity);
+  });
+
+  it("free order: never places a rotatable heavier item above a lighter stackable item, even though rotation gives it a footprint that would geometrically fit there", () => {
+    // Vehicle footprint exactly matches "light"'s footprint, and height fits exactly two layers, so
+    // stacking is the only way both items can be placed. "heavy" is rotatable and one of its
+    // rotations exactly matches that footprint too — proving rotation flexibility alone is never
+    // used to bypass the weight-based stacking rule (FR-010).
+    const request: FitCheckRequest = {
+      vehicle: { length: 50, width: 50, height: 20, maxPayload: 1000 },
+      items: [
+        { id: "light", length: 50, width: 50, height: 10, weight: 5, quantity: 1, rotatable: false, stackable: true },
+        { id: "heavy", length: 10, width: 50, height: 50, weight: 20, quantity: 1, rotatable: true, stackable: true },
+      ],
+      preserveOrder: false,
+    };
+    const result = runFitCheck(request);
+
+    if (!result.fits) return;
+
+    const heavy = result.placements.find((p) => p.itemId === "heavy");
+    const light = result.placements.find((p) => p.itemId === "light");
+    expect(heavy?.position.z).toBeLessThan(light?.position.z ?? Infinity);
+  });
+
+  it("preserve order: reports no-fit (weight-stacking reason) rather than rotating the heavier item into a technically-fitting spot above a lighter one", () => {
+    // Same shape as the free-order case above, but preserveOrder: true forces "light" to be placed
+    // first (as entered) and "heavy" second. Rotating "heavy" into the vehicle's exact footprint
+    // would let it fit geometrically directly above "light" — the algorithm must still refuse,
+    // because that spot violates the weight-stacking rule, and no other spot exists.
+    const request: FitCheckRequest = {
+      vehicle: { length: 50, width: 50, height: 20, maxPayload: 1000 },
+      items: [
+        { id: "light", length: 50, width: 50, height: 10, weight: 5, quantity: 1, rotatable: false, stackable: true },
+        { id: "heavy", length: 10, width: 50, height: 50, weight: 20, quantity: 1, rotatable: true, stackable: true },
+      ],
+      preserveOrder: true,
+    };
+    const result = runFitCheck(request);
+
+    expect(result.fits).toBe(false);
+    expect(result.reason).toMatch(/weight-based stacking/i);
+    expect(result.reason).toContain("heavy");
+  });
+
+  it("rotation validity: a placed rotatable item's size is exactly one of its eligible orientations, not an unvalidated combination of its dimensions", () => {
+    // Only one of the item's 6 possible orientations (80x20x10, a genuine rotation of the entered
+    // 10x80x20) satisfies the vehicle's bounds — proving the algorithm picks a real, validated
+    // orientation rather than some other combination of the item's own dimensions.
+    const item = {
+      id: "plank",
+      length: 10,
+      width: 80,
+      height: 20,
+      weight: 1,
+      quantity: 1,
+      rotatable: true,
+      stackable: true,
+    };
+    const request: FitCheckRequest = {
+      vehicle: { length: 100, width: 30, height: 15, maxPayload: 1000 },
+      items: [item],
+      preserveOrder: false,
+    };
+    const result = runFitCheck(request);
+
+    expect(result.fits).toBe(true);
+    const eligibleOrientations = getEligibleOrientations(
+      { length: item.length, width: item.width, height: item.height },
+      item.rotatable,
+    );
+    expect(eligibleOrientations).toContainEqual(result.placements[0].size);
   });
 });

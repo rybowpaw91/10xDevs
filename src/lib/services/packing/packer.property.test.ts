@@ -120,60 +120,101 @@ describe("runFitCheck property: weight-based stacking", () => {
   });
 });
 
+// Vehicle dims (20-120) are generated independently of item dims (5-50), so under requestArb a
+// unit almost always has floor space to spare — genuine stacking, let alone a *weight-violating*
+// stack, is a rare emergent event. Measured empirically: with the FR-010 check disabled, a combined
+// property driven only by requestArb caught the regression in under a third of runs. stackForcingArb
+// exists specifically to make stacking (and weight-order violations) common instead of incidental.
+const stackForcingArb: fc.Arbitrary<FitCheckRequest> = fc.integer({ min: 2, max: 4 }).chain((unitCount) =>
+  fc
+    .record({
+      size: fc.integer({ min: 10, max: 40 }),
+      units: fc.array(
+        fc.record({
+          weight: fc.integer({ min: 1, max: 50 }),
+          rotatable: fc.boolean(),
+          stackable: fc.boolean(),
+        }),
+        { minLength: unitCount, maxLength: unitCount },
+      ),
+      preserveOrder: fc.boolean(),
+    })
+    .map(({ size, units, preserveOrder }) => ({
+      // Every item is a cube of the same size: the vehicle's footprint exactly matches it (no side
+      // room at any layer) and its height exactly fits one cube per unit — the only way every unit
+      // can be placed is stacked in a single column, regardless of pack order or rotation.
+      items: units.map((unit, index) => ({
+        id: `stack-${index}`,
+        length: size,
+        width: size,
+        height: size,
+        weight: unit.weight,
+        quantity: 1,
+        rotatable: unit.rotatable,
+        stackable: unit.stackable,
+      })),
+      vehicle: { length: size, width: size, height: size * units.length, maxPayload: 1_000_000 },
+      preserveOrder,
+    })),
+);
+
+function assertCombinedInvariant(request: FitCheckRequest): void {
+  const result = runFitCheck(request);
+  if (!result.fits) return;
+
+  const itemById = new Map<string, GoodsItemInput>(request.items.map((item) => [item.id, item]));
+  const totalWeight = request.items.reduce((sum, item) => sum + item.weight * item.quantity, 0);
+  expect(totalWeight).toBeLessThanOrEqual(request.vehicle.maxPayload + EPSILON);
+
+  for (const unit of result.placements) {
+    expect(unit.position.x).toBeGreaterThanOrEqual(0);
+    expect(unit.position.y).toBeGreaterThanOrEqual(0);
+    expect(unit.position.z).toBeGreaterThanOrEqual(0);
+    expect(unit.position.x + unit.size.length).toBeLessThanOrEqual(request.vehicle.length + EPSILON);
+    expect(unit.position.y + unit.size.width).toBeLessThanOrEqual(request.vehicle.width + EPSILON);
+    expect(unit.position.z + unit.size.height).toBeLessThanOrEqual(request.vehicle.height + EPSILON);
+
+    const item = itemById.get(unit.itemId);
+    if (!item) throw new Error(`placement references unknown item "${unit.itemId}"`);
+
+    const eligibleOrientations = getEligibleOrientations(
+      { length: item.length, width: item.width, height: item.height },
+      item.rotatable,
+    );
+    const isValidOrientation = eligibleOrientations.some(
+      (orientation) =>
+        orientation.length === unit.size.length &&
+        orientation.width === unit.size.width &&
+        orientation.height === unit.size.height,
+    );
+    expect(isValidOrientation).toBe(true);
+  }
+
+  for (let i = 0; i < result.placements.length; i++) {
+    for (let j = i + 1; j < result.placements.length; j++) {
+      expect(overlaps(result.placements[i], result.placements[j])).toBe(false);
+    }
+  }
+
+  for (const above of result.placements) {
+    for (const below of result.placements) {
+      if (above === below) continue;
+      if (!isDirectlyBelow(below, above)) continue;
+
+      const belowWeight = itemById.get(below.itemId)?.weight ?? 0;
+      const aboveWeight = itemById.get(above.itemId)?.weight ?? 0;
+      expect(belowWeight + EPSILON).toBeGreaterThanOrEqual(aboveWeight);
+    }
+  }
+}
+
 describe("runFitCheck property: combined correctness invariant (rotation + stacking + weight)", () => {
   it("never reports fits:true unless every placement is in-bounds, non-overlapping, a valid rotation of its item, weight-stacking-compliant, and within the payload cap", () => {
-    fc.assert(
-      fc.property(requestArb, (request) => {
-        const result = runFitCheck(request);
-        if (!result.fits) return;
+    fc.assert(fc.property(requestArb, assertCombinedInvariant), { numRuns: 250 });
+  });
 
-        const itemById = new Map<string, GoodsItemInput>(request.items.map((item) => [item.id, item]));
-        const totalWeight = request.items.reduce((sum, item) => sum + item.weight * item.quantity, 0);
-        expect(totalWeight).toBeLessThanOrEqual(request.vehicle.maxPayload + EPSILON);
-
-        for (const unit of result.placements) {
-          expect(unit.position.x).toBeGreaterThanOrEqual(0);
-          expect(unit.position.y).toBeGreaterThanOrEqual(0);
-          expect(unit.position.z).toBeGreaterThanOrEqual(0);
-          expect(unit.position.x + unit.size.length).toBeLessThanOrEqual(request.vehicle.length + EPSILON);
-          expect(unit.position.y + unit.size.width).toBeLessThanOrEqual(request.vehicle.width + EPSILON);
-          expect(unit.position.z + unit.size.height).toBeLessThanOrEqual(request.vehicle.height + EPSILON);
-
-          const item = itemById.get(unit.itemId);
-          if (!item) throw new Error(`placement references unknown item "${unit.itemId}"`);
-
-          const eligibleOrientations = getEligibleOrientations(
-            { length: item.length, width: item.width, height: item.height },
-            item.rotatable,
-          );
-          const isValidOrientation = eligibleOrientations.some(
-            (orientation) =>
-              orientation.length === unit.size.length &&
-              orientation.width === unit.size.width &&
-              orientation.height === unit.size.height,
-          );
-          expect(isValidOrientation).toBe(true);
-        }
-
-        for (let i = 0; i < result.placements.length; i++) {
-          for (let j = i + 1; j < result.placements.length; j++) {
-            expect(overlaps(result.placements[i], result.placements[j])).toBe(false);
-          }
-        }
-
-        for (const above of result.placements) {
-          for (const below of result.placements) {
-            if (above === below) continue;
-            if (!isDirectlyBelow(below, above)) continue;
-
-            const belowWeight = itemById.get(below.itemId)?.weight ?? 0;
-            const aboveWeight = itemById.get(above.itemId)?.weight ?? 0;
-            expect(belowWeight + EPSILON).toBeGreaterThanOrEqual(aboveWeight);
-          }
-        }
-      }),
-      { numRuns: 250 },
-    );
+  it("holds under stack-forced scenarios, where every unit must share a single vertical column", () => {
+    fc.assert(fc.property(stackForcingArb, assertCombinedInvariant), { numRuns: 250 });
   });
 });
 

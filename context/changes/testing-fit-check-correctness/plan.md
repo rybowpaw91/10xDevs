@@ -180,24 +180,24 @@ Not applicable — test-only change, no data or schema migration.
 
 #### Automated
 
-- [x] 1.1 Lint passes: `npm run lint`
-- [x] 1.2 All tests pass: `npm run test`
-- [x] 1.3 Targeted file passes in isolation: `npx vitest run src/lib/services/packing/packer.property.test.ts`
+- [x] 1.1 Lint passes: `npm run lint` — 5ecba53
+- [x] 1.2 All tests pass: `npm run test` — 5ecba53
+- [x] 1.3 Targeted file passes in isolation: `npx vitest run src/lib/services/packing/packer.property.test.ts` — 5ecba53
 
 #### Manual
 
-- [x] 1.4 Reintroducing the historical bug locally causes the new combined-invariant and boundary properties to fail
-- [x] 1.5 CI runtime for `npm run test` does not regress noticeably from the `numRuns` increase
+- [x] 1.4 Reintroducing the historical bug locally causes the new combined-invariant and boundary properties to fail — 5ecba53
+- [x] 1.5 CI runtime for `npm run test` does not regress noticeably from the `numRuns` increase — 5ecba53
 
 ### Phase 2: Deterministic combined-scenario unit tests + cookbook close-out
 
 #### Automated
 
-- [ ] 2.1 All tests pass: `npm run test`
-- [ ] 2.2 Lint passes: `npm run lint`
-- [ ] 2.3 New scenario tests fail as expected when the historical bug is reintroduced locally
+- [x] 2.1 All tests pass: `npm run test`
+- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.3 New scenario tests fail as expected when the historical bug is reintroduced locally
 
 #### Manual
 
-- [ ] 2.4 `context/foundation/test-plan.md` §6.1 no longer reads `TBD` and accurately describes where/how to add a packing test
-- [ ] 2.5 A reviewer unfamiliar with the property tests can read the three new unit-test scenarios and understand the guarantee each one pins
+- [x] 2.4 `context/foundation/test-plan.md` §6.1 no longer reads `TBD` and accurately describes where/how to add a packing test
+- [x] 2.5 A reviewer unfamiliar with the property tests can read the three new unit-test scenarios and understand the guarantee each one pins
