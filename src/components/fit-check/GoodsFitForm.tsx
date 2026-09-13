@@ -65,6 +65,16 @@ interface ProfileEditDraft {
   maxPayload: string;
 }
 
+interface TemplateEditDraft {
+  label: string;
+  length: string;
+  width: string;
+  height: string;
+  weight: string;
+  rotatable: boolean;
+  stackable: boolean;
+}
+
 interface ErrorTree {
   errors: string[];
   properties?: Record<string, ErrorTree>;
@@ -165,6 +175,11 @@ export default function GoodsFitForm() {
   const [itemTemplateError, setItemTemplateError] = useState<string | null>(null);
   const [savingItemTemplateKey, setSavingItemTemplateKey] = useState<string | null>(null);
   const [templateSelectValue, setTemplateSelectValue] = useState("");
+
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [templateEditDraft, setTemplateEditDraft] = useState<TemplateEditDraft | null>(null);
+  const [templateEditError, setTemplateEditError] = useState<string | null>(null);
+  const [savingTemplateEdit, setSavingTemplateEdit] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -366,6 +381,7 @@ export default function GoodsFitForm() {
       length: Number(row.length),
       width: Number(row.width),
       height: Number(row.height),
+      weight: Number(row.weight),
       rotatable: row.rotatable,
       stackable: row.stackable,
     });
@@ -407,7 +423,7 @@ export default function GoodsFitForm() {
         length: String(template.length),
         width: String(template.width),
         height: String(template.height),
-        weight: "",
+        weight: template.weight != null ? String(template.weight) : "",
         quantity: "1",
         rotatable: template.rotatable,
         stackable: template.stackable,
@@ -434,6 +450,67 @@ export default function GoodsFitForm() {
       setSavedItemTemplates((prev) => prev.filter((template) => template.id !== id));
     } catch {
       setItemTemplateError("Could not reach the server. Please try again.");
+    }
+  }
+
+  function startEditTemplate(template: GoodsItemTemplate) {
+    setEditingTemplateId(template.id);
+    setTemplateEditDraft({
+      label: template.label,
+      length: String(template.length),
+      width: String(template.width),
+      height: String(template.height),
+      weight: template.weight != null ? String(template.weight) : "",
+      rotatable: template.rotatable,
+      stackable: template.stackable,
+    });
+    setTemplateEditError(null);
+  }
+
+  function cancelEditTemplate() {
+    setEditingTemplateId(null);
+    setTemplateEditDraft(null);
+    setTemplateEditError(null);
+  }
+
+  async function saveTemplateEdit(id: string) {
+    if (!templateEditDraft) return;
+    setTemplateEditError(null);
+
+    const parsed = goodsItemTemplateInputSchema.safeParse({
+      label: templateEditDraft.label.trim(),
+      length: Number(templateEditDraft.length),
+      width: Number(templateEditDraft.width),
+      height: Number(templateEditDraft.height),
+      weight: Number(templateEditDraft.weight),
+      rotatable: templateEditDraft.rotatable,
+      stackable: templateEditDraft.stackable,
+    });
+    if (!parsed.success) {
+      setTemplateEditError(collectZodErrors(z.treeifyError(parsed.error)).join(" "));
+      return;
+    }
+
+    setSavingTemplateEdit(true);
+    try {
+      const response = await fetch(`/api/goods-item-templates/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!response.ok) {
+        setTemplateEditError(`Could not save changes (status ${response.status}).`);
+        return;
+      }
+
+      const updated = (await response.json()) as GoodsItemTemplate;
+      setSavedItemTemplates((prev) => prev.map((template) => (template.id === id ? updated : template)));
+      cancelEditTemplate();
+    } catch {
+      setTemplateEditError("Could not reach the server. Please try again.");
+    } finally {
+      setSavingTemplateEdit(false);
     }
   }
 
@@ -733,6 +810,110 @@ export default function GoodsFitForm() {
           </DialogContent>
         </Dialog>
 
+        <Dialog
+          open={editingTemplateId !== null}
+          onOpenChange={(open) => {
+            if (!open) cancelEditTemplate();
+          }}
+        >
+          <DialogContent className="text-foreground">
+            <DialogHeader>
+              <DialogTitle>Edit saved item</DialogTitle>
+              <DialogDescription>Update the saved label, dimensions, weight, and flags.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Label className="mb-1">Label</Label>
+                <Input
+                  value={templateEditDraft?.label ?? ""}
+                  onChange={(e) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, label: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Length (cm)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={templateEditDraft?.length ?? ""}
+                  onChange={(e) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, length: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Width (cm)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={templateEditDraft?.width ?? ""}
+                  onChange={(e) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, width: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Height (cm)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={templateEditDraft?.height ?? ""}
+                  onChange={(e) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, height: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Weight (kg)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={templateEditDraft?.weight ?? ""}
+                  onChange={(e) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, weight: e.target.value } : prev));
+                  }}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={templateEditDraft?.rotatable ?? false}
+                  onCheckedChange={(checked) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, rotatable: checked === true } : prev));
+                  }}
+                />
+                <Label>Can be rotated</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={templateEditDraft?.stackable ?? false}
+                  onCheckedChange={(checked) => {
+                    setTemplateEditDraft((prev) => (prev ? { ...prev, stackable: checked === true } : prev));
+                  }}
+                />
+                <Label>Other items can stack on it</Label>
+              </div>
+            </div>
+            {templateEditError && <p className="text-sm text-red-300">{templateEditError}</p>}
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={cancelEditTemplate}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={savingTemplateEdit}
+                onClick={() => {
+                  if (editingTemplateId) void saveTemplateEdit(editingTemplateId);
+                }}
+              >
+                <Save className="size-4" />
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <section>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-white">Goods list</h2>
@@ -750,36 +931,59 @@ export default function GoodsFitForm() {
                           key={template.id}
                           value={template.id}
                           className="focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default items-center justify-between gap-2 rounded-sm py-1.5 pr-2 pl-2 text-sm outline-hidden select-none"
-                          // The delete button below is a nested interactive element inside this
-                          // role="option" item, so it isn't Tab-reachable — Delete/Backspace on the
-                          // focused option is the keyboard path to the same action.
+                          // Edit/Delete below are nested interactive elements inside this role="option"
+                          // item, so they aren't Tab-reachable — F2/Delete on the focused option are
+                          // the keyboard paths to the same actions.
                           onKeyDown={(e) => {
                             if (e.key === "Delete" || e.key === "Backspace") {
                               e.preventDefault();
                               void deleteItemTemplate(template.id);
+                            } else if (e.key === "F2") {
+                              e.preventDefault();
+                              startEditTemplate(template);
                             }
                           }}
                         >
                           <SelectPrimitive.ItemText>
-                            {template.label} ({template.length}x{template.width}x{template.height} cm)
+                            {template.label} ({template.length}x{template.width}x{template.height} cm
+                            {template.weight != null ? `, ${template.weight}kg` : ""})
                           </SelectPrimitive.ItemText>
-                          <button
-                            type="button"
-                            aria-label={`Delete ${template.label}`}
-                            className="text-red-600 hover:text-red-800"
-                            onPointerDown={(e) => {
-                              e.stopPropagation();
-                            }}
-                            onPointerUp={(e) => {
-                              e.stopPropagation();
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void deleteItemTemplate(template.id);
-                            }}
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              aria-label={`Edit ${template.label}`}
+                              className="text-blue-700 hover:text-blue-900"
+                              onPointerDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onPointerUp={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startEditTemplate(template);
+                              }}
+                            >
+                              <Pencil className="size-4" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={`Delete ${template.label}`}
+                              className="text-red-600 hover:text-red-800"
+                              onPointerDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onPointerUp={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                void deleteItemTemplate(template.id);
+                              }}
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          </div>
                         </SelectPrimitive.Item>
                       ))}
                     </SelectGroup>

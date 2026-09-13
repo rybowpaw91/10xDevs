@@ -256,14 +256,14 @@ Additive only — a new RLS policy and a new nullable column on an existing tabl
 
 #### Automated
 
-- [x] 1.1 `npx supabase start` succeeds and both new migrations apply cleanly
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 Type checking passes
+- [x] 1.1 `npx supabase start` succeeds and both new migrations apply cleanly — ea1cdfa
+- [x] 1.2 `npm run lint` passes — ea1cdfa
+- [x] 1.3 Type checking passes — ea1cdfa
 
 #### Manual
 
-- [x] 1.4 Exactly four policies exist on `goods_item_templates`, all scoped `to authenticated`
-- [x] 1.5 The `weight` column exists, is nullable, and has a `check (weight > 0)` constraint
+- [x] 1.4 Exactly four policies exist on `goods_item_templates`, all scoped `to authenticated` — ea1cdfa
+- [x] 1.5 The `weight` column exists, is nullable, and has a `check (weight > 0)` constraint — ea1cdfa
 
 ### Phase 2: API Route — PATCH Handler + weight Threading
 
@@ -287,18 +287,18 @@ Additive only — a new RLS policy and a new nullable column on an existing tabl
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 Type checking passes
-- [ ] 3.3 `npm run build` succeeds
-- [ ] 3.4 `npm run test` passes
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 Type checking passes
+- [x] 3.3 `npm run build` succeeds
+- [x] 3.4 `npm run test` passes
 
 #### Manual
 
-- [ ] 3.5 Dropdown shows working Edit/Delete icon buttons that don't trigger selection
-- [ ] 3.6 Edit (click or F2) opens the modal dialog pre-filled correctly
-- [ ] 3.7 Delete/Backspace still deletes without opening the dialog (regression check)
-- [ ] 3.8 Save persists the change and updates the dropdown, including label text; Cancel discards with no request sent
-- [ ] 3.9 Saving a new template captures the row's current weight
-- [ ] 3.10 Loading a template prefills the new row's weight
-- [ ] 3.11 Weight required and editable in both create and edit flows
-- [ ] 3.12 Signed-out visit still redirects to sign-in
+- [x] 3.5 Dropdown shows working Edit/Delete icon buttons that don't trigger selection
+- [x] 3.6 Edit (click or F2) opens the modal dialog pre-filled correctly
+- [x] 3.7 Delete/Backspace still deletes without opening the dialog (regression check)
+- [x] 3.8 Save persists the change and updates the dropdown, including label text; Cancel discards with no request sent
+- [x] 3.9 Saving a new template captures the row's current weight
+- [x] 3.10 Loading a template prefills the new row's weight
+- [x] 3.11 Weight required and editable in both create and edit flows
+- [x] 3.12 Signed-out visit still redirects to sign-in
