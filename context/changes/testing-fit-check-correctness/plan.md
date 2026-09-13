@@ -193,11 +193,11 @@ Not applicable — test-only change, no data or schema migration.
 
 #### Automated
 
-- [x] 2.1 All tests pass: `npm run test`
-- [x] 2.2 Lint passes: `npm run lint`
-- [x] 2.3 New scenario tests fail as expected when the historical bug is reintroduced locally
+- [x] 2.1 All tests pass: `npm run test` — c369cf2
+- [x] 2.2 Lint passes: `npm run lint` — c369cf2
+- [x] 2.3 New scenario tests fail as expected when the historical bug is reintroduced locally — c369cf2
 
 #### Manual
 
-- [x] 2.4 `context/foundation/test-plan.md` §6.1 no longer reads `TBD` and accurately describes where/how to add a packing test
-- [x] 2.5 A reviewer unfamiliar with the property tests can read the three new unit-test scenarios and understand the guarantee each one pins
+- [x] 2.4 `context/foundation/test-plan.md` §6.1 no longer reads `TBD` and accurately describes where/how to add a packing test — c369cf2
+- [x] 2.5 A reviewer unfamiliar with the property tests can read the three new unit-test scenarios and understand the guarantee each one pins — c369cf2
