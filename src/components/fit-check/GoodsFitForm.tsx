@@ -647,8 +647,11 @@ export default function GoodsFitForm() {
               </Select>
             </div>
             <div>
-              <Label className="mb-1 text-blue-100/80">Length (cm)</Label>
+              <Label htmlFor="vehicle-length" className="mb-1 text-blue-100/80">
+                Length (cm)
+              </Label>
               <Input
+                id="vehicle-length"
                 type="number"
                 min="0"
                 value={vehicle.length}
@@ -659,8 +662,11 @@ export default function GoodsFitForm() {
               />
             </div>
             <div>
-              <Label className="mb-1 text-blue-100/80">Width (cm)</Label>
+              <Label htmlFor="vehicle-width" className="mb-1 text-blue-100/80">
+                Width (cm)
+              </Label>
               <Input
+                id="vehicle-width"
                 type="number"
                 min="0"
                 value={vehicle.width}
@@ -671,8 +677,11 @@ export default function GoodsFitForm() {
               />
             </div>
             <div>
-              <Label className="mb-1 text-blue-100/80">Height (cm)</Label>
+              <Label htmlFor="vehicle-height" className="mb-1 text-blue-100/80">
+                Height (cm)
+              </Label>
               <Input
+                id="vehicle-height"
                 type="number"
                 min="0"
                 value={vehicle.height}
@@ -683,8 +692,11 @@ export default function GoodsFitForm() {
               />
             </div>
             <div>
-              <Label className="mb-1 text-blue-100/80">Max payload (kg)</Label>
+              <Label htmlFor="vehicle-max-payload" className="mb-1 text-blue-100/80">
+                Max payload (kg)
+              </Label>
               <Input
+                id="vehicle-max-payload"
                 type="number"
                 min="0"
                 value={vehicle.maxPayload}
@@ -698,8 +710,11 @@ export default function GoodsFitForm() {
 
           <div className="mt-3 flex flex-wrap items-end gap-3">
             <div className="min-w-48 flex-1">
-              <Label className="mb-1 text-blue-100/80">Save current as profile</Label>
+              <Label htmlFor="profile-label" className="mb-1 text-blue-100/80">
+                Save current as profile
+              </Label>
               <Input
+                id="profile-label"
                 value={profileLabel}
                 onChange={(e) => {
                   setProfileLabel(e.target.value);
@@ -737,8 +752,11 @@ export default function GoodsFitForm() {
             </DialogHeader>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label className="mb-1">Label</Label>
+                <Label htmlFor="edit-profile-label" className="mb-1">
+                  Label
+                </Label>
                 <Input
+                  id="edit-profile-label"
                   value={profileEditDraft?.label ?? ""}
                   onChange={(e) => {
                     setProfileEditDraft((prev) => (prev ? { ...prev, label: e.target.value } : prev));
@@ -746,8 +764,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Length (cm)</Label>
+                <Label htmlFor="edit-profile-length" className="mb-1">
+                  Length (cm)
+                </Label>
                 <Input
+                  id="edit-profile-length"
                   type="number"
                   min="0"
                   value={profileEditDraft?.length ?? ""}
@@ -757,8 +778,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Width (cm)</Label>
+                <Label htmlFor="edit-profile-width" className="mb-1">
+                  Width (cm)
+                </Label>
                 <Input
+                  id="edit-profile-width"
                   type="number"
                   min="0"
                   value={profileEditDraft?.width ?? ""}
@@ -768,8 +792,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Height (cm)</Label>
+                <Label htmlFor="edit-profile-height" className="mb-1">
+                  Height (cm)
+                </Label>
                 <Input
+                  id="edit-profile-height"
                   type="number"
                   min="0"
                   value={profileEditDraft?.height ?? ""}
@@ -779,8 +806,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Max payload (kg)</Label>
+                <Label htmlFor="edit-profile-max-payload" className="mb-1">
+                  Max payload (kg)
+                </Label>
                 <Input
+                  id="edit-profile-max-payload"
                   type="number"
                   min="0"
                   value={profileEditDraft?.maxPayload ?? ""}
@@ -823,8 +853,11 @@ export default function GoodsFitForm() {
             </DialogHeader>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label className="mb-1">Label</Label>
+                <Label htmlFor="edit-template-label" className="mb-1">
+                  Label
+                </Label>
                 <Input
+                  id="edit-template-label"
                   value={templateEditDraft?.label ?? ""}
                   onChange={(e) => {
                     setTemplateEditDraft((prev) => (prev ? { ...prev, label: e.target.value } : prev));
@@ -832,8 +865,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Length (cm)</Label>
+                <Label htmlFor="edit-template-length" className="mb-1">
+                  Length (cm)
+                </Label>
                 <Input
+                  id="edit-template-length"
                   type="number"
                   min="0"
                   value={templateEditDraft?.length ?? ""}
@@ -843,8 +879,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Width (cm)</Label>
+                <Label htmlFor="edit-template-width" className="mb-1">
+                  Width (cm)
+                </Label>
                 <Input
+                  id="edit-template-width"
                   type="number"
                   min="0"
                   value={templateEditDraft?.width ?? ""}
@@ -854,8 +893,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Height (cm)</Label>
+                <Label htmlFor="edit-template-height" className="mb-1">
+                  Height (cm)
+                </Label>
                 <Input
+                  id="edit-template-height"
                   type="number"
                   min="0"
                   value={templateEditDraft?.height ?? ""}
@@ -865,8 +907,11 @@ export default function GoodsFitForm() {
                 />
               </div>
               <div>
-                <Label className="mb-1">Weight (kg)</Label>
+                <Label htmlFor="edit-template-weight" className="mb-1">
+                  Weight (kg)
+                </Label>
                 <Input
+                  id="edit-template-weight"
                   type="number"
                   min="0"
                   value={templateEditDraft?.weight ?? ""}
@@ -1020,8 +1065,11 @@ export default function GoodsFitForm() {
               <div key={row.key} className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <div className="grid gap-3 sm:grid-cols-7">
                   <div className="sm:col-span-2">
-                    <Label className="mb-1 text-blue-100/80">Label</Label>
+                    <Label htmlFor={`item-label-${row.key}`} className="mb-1 text-blue-100/80">
+                      Label
+                    </Label>
                     <Input
+                      id={`item-label-${row.key}`}
                       value={row.label}
                       onChange={(e) => {
                         updateRow(row.key, { label: e.target.value });
@@ -1030,8 +1078,11 @@ export default function GoodsFitForm() {
                     />
                   </div>
                   <div>
-                    <Label className="mb-1 text-blue-100/80">Length</Label>
+                    <Label htmlFor={`item-length-${row.key}`} className="mb-1 text-blue-100/80">
+                      Length
+                    </Label>
                     <Input
+                      id={`item-length-${row.key}`}
                       type="number"
                       min="0"
                       value={row.length}
@@ -1042,8 +1093,11 @@ export default function GoodsFitForm() {
                     />
                   </div>
                   <div>
-                    <Label className="mb-1 text-blue-100/80">Width</Label>
+                    <Label htmlFor={`item-width-${row.key}`} className="mb-1 text-blue-100/80">
+                      Width
+                    </Label>
                     <Input
+                      id={`item-width-${row.key}`}
                       type="number"
                       min="0"
                       value={row.width}
@@ -1054,8 +1108,11 @@ export default function GoodsFitForm() {
                     />
                   </div>
                   <div>
-                    <Label className="mb-1 text-blue-100/80">Height</Label>
+                    <Label htmlFor={`item-height-${row.key}`} className="mb-1 text-blue-100/80">
+                      Height
+                    </Label>
                     <Input
+                      id={`item-height-${row.key}`}
                       type="number"
                       min="0"
                       value={row.height}
@@ -1066,8 +1123,11 @@ export default function GoodsFitForm() {
                     />
                   </div>
                   <div>
-                    <Label className="mb-1 text-blue-100/80">Weight (kg)</Label>
+                    <Label htmlFor={`item-weight-${row.key}`} className="mb-1 text-blue-100/80">
+                      Weight (kg)
+                    </Label>
                     <Input
+                      id={`item-weight-${row.key}`}
                       type="number"
                       min="0"
                       value={row.weight}
@@ -1078,8 +1138,11 @@ export default function GoodsFitForm() {
                     />
                   </div>
                   <div>
-                    <Label className="mb-1 text-blue-100/80">Quantity</Label>
+                    <Label htmlFor={`item-quantity-${row.key}`} className="mb-1 text-blue-100/80">
+                      Quantity
+                    </Label>
                     <Input
+                      id={`item-quantity-${row.key}`}
                       type="number"
                       min="1"
                       value={row.quantity}
